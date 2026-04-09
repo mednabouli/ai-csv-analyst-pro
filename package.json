@@ -17,7 +17,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe"
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "db:seed:test": "tsx scripts/seed-test-user.ts",
+    "stripe:setup": "tsx scripts/setup-stripe.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.0",
