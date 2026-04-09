@@ -91,7 +91,7 @@ export function DashboardShell({ user: _user, initialSessions, initialHasMore, i
     setSidebarOpen(false);
     const msgs = await getSessionMessagesAction(id);   // await outside any transition
     setMessages(msgs as Message[]);                    // sync React state update
-  }, [stop, setMessages]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stop, setMessages]);  
 
   function handleNew() {
     stop();

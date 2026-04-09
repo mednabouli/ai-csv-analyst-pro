@@ -18,7 +18,7 @@ export function useCsrf() {
     setCsrfToken(token);
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => { refresh(); }, []);
 
   /** Append the CSRF field to an existing FormData before submitting. */
   const appendCsrf = useCallback(
