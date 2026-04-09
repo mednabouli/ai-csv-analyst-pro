@@ -1,0 +1,9 @@
+# All files require review from med
+* @mednabouli
+
+# Critical paths require explicit approval
+/lib/db/         @mednabouli
+/lib/billing.ts  @mednabouli
+/lib/auth.ts     @mednabouli
+/app/api/webhooks/ @mednabouli
+/proxy.ts        @mednabouli
