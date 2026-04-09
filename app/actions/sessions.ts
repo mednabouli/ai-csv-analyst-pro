@@ -1,11 +1,13 @@
 "use server";
 import { db } from "@/lib/db";
 import { sessions, chatMessages, csvChunks } from "@/lib/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, lt } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import type { Message } from "ai";
+
+export const PAGE_SIZE = 20;
 
 export type SessionRow = {
   id: string;
@@ -16,22 +18,65 @@ export type SessionRow = {
   createdAt: Date;
 };
 
-export async function getUserSessionsAction(): Promise<SessionRow[]> {
+export type SessionPage = {
+  sessions: SessionRow[];
+  hasMore: boolean;
+  nextCursor: Date | null;
+};
+
+const SESSION_COLS = {
+  id:          sessions.id,
+  fileName:    sessions.fileName,
+  rowCount:    sessions.rowCount,
+  columnCount: sessions.columnCount,
+  sizeBytes:   sessions.sizeBytes,
+  createdAt:   sessions.createdAt,
+};
+
+export async function getUserSessionsAction(): Promise<SessionPage> {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return [];
-  return db
-    .select({
-      id: sessions.id,
-      fileName: sessions.fileName,
-      rowCount: sessions.rowCount,
-      columnCount: sessions.columnCount,
-      sizeBytes: sessions.sizeBytes,
-      createdAt: sessions.createdAt,
-    })
+  if (!session) return { sessions: [], hasMore: false, nextCursor: null };
+
+  // Fetch PAGE_SIZE + 1 to detect whether more pages exist
+  const rows = await db
+    .select(SESSION_COLS)
     .from(sessions)
     .where(eq(sessions.userId, session.user.id))
     .orderBy(desc(sessions.createdAt))
-    .limit(100);
+    .limit(PAGE_SIZE + 1);
+
+  const hasMore = rows.length > PAGE_SIZE;
+  const page    = rows.slice(0, PAGE_SIZE);
+  return {
+    sessions:   page,
+    hasMore,
+    nextCursor: hasMore ? page[page.length - 1].createdAt : null,
+  };
+}
+
+export async function getMoreSessionsAction(cursor: Date): Promise<SessionPage> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { sessions: [], hasMore: false, nextCursor: null };
+
+  const rows = await db
+    .select(SESSION_COLS)
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.userId, session.user.id),
+        lt(sessions.createdAt, cursor)         // strictly older than cursor
+      )
+    )
+    .orderBy(desc(sessions.createdAt))
+    .limit(PAGE_SIZE + 1);
+
+  const hasMore = rows.length > PAGE_SIZE;
+  const page    = rows.slice(0, PAGE_SIZE);
+  return {
+    sessions:   page,
+    hasMore,
+    nextCursor: hasMore ? page[page.length - 1].createdAt : null,
+  };
 }
 
 export async function getSessionMessagesAction(sessionId: string): Promise<Message[]> {
@@ -73,8 +118,6 @@ export async function renameSessionAction(sessionId: string, name: string): Prom
 export async function deleteSessionAction(sessionId: string): Promise<void> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return;
-  // Cascade via FK — chunks + messages deleted automatically if schema has onDelete: "cascade"
-  // Explicit fallback for safety:
   await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId));
   await db.delete(csvChunks).where(eq(csvChunks.sessionId, sessionId));
   await db
