@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -7,7 +7,18 @@ export const metadata: Metadata = {
   description: "Upload any CSV file and have a natural language conversation with your data.",
 };
 
-// Inline script applied BEFORE first paint to avoid flash of wrong theme
+// ── Fix: explicit viewport export prevents mobile Safari from zooming to desktop width
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,       // allow user pinch-zoom for accessibility
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)",  color: "#171717" },
+  ],
+};
+
+// Inline script: apply dark class BEFORE first paint to prevent flash
 const themeScript = `(function(){
   try {
     var t = localStorage.getItem("theme");
