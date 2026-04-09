@@ -45,7 +45,9 @@
     "@radix-ui/react-scroll-area": "^1.2.0",
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-dialog": "^1.1.0",
-    "@radix-ui/react-toast": "^1.2.0"
+    "@radix-ui/react-toast": "^1.2.0",
+    "@sentry/nextjs": "^9.15.0",
+    "langfuse": "^3.0.0"
   },
   "devDependencies": {
     "typescript": "^5.8.0",

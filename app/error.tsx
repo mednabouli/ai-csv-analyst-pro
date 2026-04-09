@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 export default function GlobalError({
   error,
@@ -9,8 +10,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log to observability tool here (Sentry etc.)
-    console.error("[GlobalError]", error.message, error.digest);
+    Sentry.captureException(error, {
+      tags: { source: "global-error-boundary" },
+      extra: { digest: error.digest },
+    });
   }, [error]);
 
   return (
@@ -24,8 +27,10 @@ export default function GlobalError({
           <p className="text-xs font-mono text-muted-foreground">ID: {error.digest}</p>
         )}
       </div>
-      <button onClick={reset}
-        className="px-6 py-2.5 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
+      <button
+        onClick={reset}
+        className="px-6 py-2.5 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
+      >
         Try again
       </button>
     </main>
