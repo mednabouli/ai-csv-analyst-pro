@@ -19,6 +19,6 @@ export default defineConfig({
         branches: 60,
       },
     },
-    setupFiles: ["./vitest.setup.ts"],
+    setupFiles: ["./lib/__tests__/vitest.setup.ts"],
   },
 });
