@@ -14,7 +14,7 @@ interface Props {
   nextCursor:  Date | null;
   activeId:    string | null;
   onSelect:    (id: string) => void;
-  onDelete:    (id: string) => void;
+  onDelete:   (id: string) => void;
   onRename:    (id: string, name: string) => void;
   onNew:       () => void;
 }
@@ -149,16 +149,16 @@ export function SessionSidebar({
     setNextCursor(initialCursor);
   }, [initialSessions, initialHasMore, initialCursor]);
 
-  function handleRename(id: string, name: string) {
+  async function handleRename(id: string, name: string) {
     setSessions((s) => s.map((x) => (x.id === id ? { ...x, fileName: name } : x)));
-    onRename(id, name);
-    startTransition(() => renameSessionAction(id, name));
+    onRename(id, name);                               // outer callback: local state only
+    await renameSessionAction(id, name, csrfToken);   // CSRF-validated server action
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     setSessions((s) => s.filter((x) => x.id !== id));
-    onDelete(id, csrfToken);
-    startTransition(() => deleteSessionAction(id));
+    onDelete(id);                               // outer callback: local state only (no csrfToken)
+    await deleteSessionAction(id, csrfToken);   // CSRF-validated server action
   }
 
   async function handleLoadMore() {
