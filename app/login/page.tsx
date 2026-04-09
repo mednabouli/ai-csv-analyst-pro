@@ -13,16 +13,16 @@ export default function LoginPage() {
     async (_prev, formData) => {
       const email      = formData.get("email") as string;
       const password   = formData.get("password") as string;
+      // FIX: dontRememberMe is the correct better-auth API.
+      // Checkbox checked → persistent 30-day session (dontRememberMe: false).
+      // Checkbox unchecked → session-scoped cookie, cleared on browser close (dontRememberMe: true).
       const rememberMe = formData.get("rememberMe") === "on";
 
       const { error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/dashboard",
-        // 30 days when "remember me", default 7 days otherwise
-        fetchOptions: {
-          headers: rememberMe ? { "x-remember-me": "true" } : undefined,
-        },
+        callbackURL:    "/dashboard",
+        dontRememberMe: !rememberMe,
       });
 
       if (error) {
@@ -64,7 +64,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <input id="rememberMe" name="rememberMe" type="checkbox"
+            <input id="rememberMe" name="rememberMe" type="checkbox" defaultChecked
               className="h-4 w-4 rounded border accent-primary" />
             <label htmlFor="rememberMe" className="text-sm text-muted-foreground select-none cursor-pointer">
               Remember me for 30 days
@@ -72,8 +72,8 @@ export default function LoginPage() {
           </div>
 
           {state?.error && (
-            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2 flex gap-2">
-              <span>{state.error}</span>
+            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2 flex gap-2 items-start">
+              <span className="flex-1">{state.error}</span>
               {state.error.includes("verify your email") && (
                 <Link href="/verify-email" className="underline shrink-0">Resend email</Link>
               )}
