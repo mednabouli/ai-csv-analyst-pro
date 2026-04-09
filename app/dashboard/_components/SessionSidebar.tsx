@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/sessions";
 
 interface Props {
+  csrfToken:  string;
   sessions:    SessionRow[];
   hasMore:     boolean;
   nextCursor:  Date | null;
@@ -128,6 +129,7 @@ function SessionItem({
 }
 
 export function SessionSidebar({
+  csrfToken,
   sessions: initialSessions,
   hasMore:  initialHasMore,
   nextCursor: initialCursor,
@@ -155,7 +157,7 @@ export function SessionSidebar({
 
   function handleDelete(id: string) {
     setSessions((s) => s.filter((x) => x.id !== id));
-    onDelete(id);
+    onDelete(id, csrfToken);
     startTransition(() => deleteSessionAction(id));
   }
 
