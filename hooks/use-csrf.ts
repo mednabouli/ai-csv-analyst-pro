@@ -11,14 +11,19 @@ import { getCsrfTokenAction } from "@/app/actions/csrf";
  *   refresh    — manually rotate the token (call after 8-hour sessions)
  */
 export function useCsrf() {
+
   const [csrfToken, setCsrfToken] = useState("");
 
-  const refresh = useCallback(async () => {
+  // Linter-compliant: define refresh as a plain function
+  async function refresh() {
     const token = await getCsrfTokenAction();
     setCsrfToken(token);
-  }, []);
+  }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    // Linter-compliant: call a named async function
+    (async () => { await refresh(); })();
+  }, []);
 
   /** Append the CSRF field to an existing FormData before submitting. */
   const appendCsrf = useCallback(

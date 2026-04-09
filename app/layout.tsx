@@ -18,21 +18,10 @@ export const viewport: Viewport = {
   ],
 };
 
-// Inline script: apply dark class BEFORE first paint to prevent flash
-const themeScript = `(function(){
-  try {
-    var t = localStorage.getItem("theme");
-    var dark = t === "dark" || (!t || t === "system") && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (dark) document.documentElement.classList.add("dark");
-  } catch(e) {}
-})()`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+      <head />
       <body>
         <Providers>{children}</Providers>
       </body>

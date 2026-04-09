@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   reactCompiler: true,
   cacheComponents: true, 
-
+  allowedDevOrigins: ['127.0.0.1'],
 
   // Security headers (backup — vercel.json is primary in production)
   async headers() {

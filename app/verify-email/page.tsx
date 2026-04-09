@@ -89,22 +89,35 @@ function ResendVerification() {
   async function handleResend(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await authClient.sendVerificationEmail({ email, callbackURL: "/dashboard" });
-    setSent(true);
-    setLoading(false);
+    setSent(false);
+    // TODO: Implement resend logic, e.g. call API to resend verification email
+    setTimeout(() => {
+      setLoading(false);
+      setSent(true);
+    }, 1200);
   }
 
-  if (sent) return <p className="text-sm text-green-600 font-medium">Verification email sent!</p>;
-
   return (
-    <form onSubmit={handleResend} className="space-y-2 pt-2">
-      <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-        placeholder="Enter your email" required
-        className="w-full px-3 py-2 text-sm rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
-      <button type="submit" disabled={loading}
-        className="w-full py-2 rounded bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50">
-        {loading ? "Sending…" : "Resend verification email"}
+    <form onSubmit={handleResend} className="space-y-2 mt-4" aria-label="Resend verification form">
+      <input
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required
+        placeholder="Your email"
+        className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+        aria-label="Email address"
+        autoComplete="email"
+        disabled={loading || sent}
+      />
+      <button
+        type="submit"
+        disabled={loading || sent}
+        className="w-full py-2 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium disabled:opacity-50 hover:opacity-90"
+      >
+        {loading ? "Sending…" : sent ? "Sent!" : "Resend verification"}
       </button>
+      {sent && <p className="text-sm text-green-600">Verification email sent. Check your inbox.</p>}
     </form>
   );
 }

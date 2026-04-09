@@ -60,59 +60,81 @@ export default function SignupPage() {
             <Link href="/login" className="text-primary underline underline-offset-4">Sign in</Link>
           </p>
         </div>
-
-        <form action={action} className="space-y-4">
+        <form action={action} className="space-y-4" aria-label="Sign up form">
           <div className="space-y-1.5">
-            <label htmlFor="name" className="text-sm font-medium">Full name</label>
-            <input id="name" name="name" type="text" placeholder="Jane Doe" required
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <label htmlFor="name" className="text-sm font-medium">Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Jane Doe"
+              required
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Full name"
+              autoComplete="name"
+            />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium">Email</label>
-            <input id="email" name="email" type="email" placeholder="jane@example.com" required
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Email address"
+              autoComplete="email"
+            />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-sm font-medium">Password</label>
-            <input id="password" name="password" type="password" placeholder="Min. 8 characters" required minLength={8}
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Min. 8 characters"
+              required
+              minLength={8}
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Password"
+              autoComplete="new-password"
+            />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="confirm" className="text-sm font-medium">Confirm password</label>
-            <input id="confirm" name="confirm" type="password" placeholder="Repeat password" required
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input
+              id="confirm"
+              name="confirm"
+              type="password"
+              placeholder="Repeat password"
+              required
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Confirm password"
+              autoComplete="new-password"
+            />
           </div>
-
           {state?.error && (
             <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2">
               {state.error}
             </p>
           )}
-
-          <button type="submit" disabled={isPending}
-            className="w-full py-2 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium disabled:opacity-50 hover:opacity-90">
-            {isPending ? "Creating account…" : "Create account"}
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full py-2 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium disabled:opacity-50 hover:opacity-90"
+          >
+            {isPending ? "Signing up…" : "Sign up"}
           </button>
         </form>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">or</span>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <button onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" })}
-            className="w-full py-2 rounded border font-medium hover:bg-muted transition-colors text-sm">
-            Continue with Google
-          </button>
-          <button onClick={() => authClient.signIn.social({ provider: "github", callbackURL: "/dashboard" })}
-            className="w-full py-2 rounded border font-medium hover:bg-muted transition-colors text-sm">
-            Continue with GitHub
-          </button>
-        </div>
-
+        <button onClick={() => authClient.signIn.social({ provider: "github", callbackURL: "/dashboard" })}
+          className="w-full py-2 rounded border font-medium hover:bg-muted transition-colors text-sm">
+          Continue with GitHub
+        </button>
         <p className="text-xs text-center text-muted-foreground">
           By creating an account you agree to our{" "}
           <Link href="/terms" className="underline underline-offset-2">Terms</Link> and{" "}

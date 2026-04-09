@@ -174,11 +174,12 @@ export function SessionSidebar({
 
   if (collapsed) {
     return (
-      <aside className="flex flex-col items-center py-4 w-12 border-r bg-background shrink-0">
+      <aside className="flex flex-col items-center py-4 w-12 border-r bg-background shrink-0" aria-label="Collapsed session sidebar">
         <button
           onClick={() => setCollapsed(false)}
-          className="p-2 rounded hover:bg-muted"
+          className="p-2 rounded hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
           title="Expand sidebar"
+          aria-label="Expand sidebar"
         >
           <ChevronLeft className="w-4 h-4 rotate-180 text-muted-foreground" />
         </button>
@@ -189,14 +190,15 @@ export function SessionSidebar({
   const groups = groupByDate(sessions);
 
   return (
-    <aside className="flex flex-col w-64 border-r bg-background shrink-0 h-full">
+    <aside className="flex flex-col w-64 border-r bg-background shrink-0 h-full" aria-label="Session sidebar">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
         <span className="font-semibold text-sm">Analyses</span>
         <button
           onClick={() => setCollapsed(true)}
-          className="p-1 rounded hover:bg-muted"
+          className="p-1 rounded hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
           title="Collapse sidebar"
+          aria-label="Collapse sidebar"
         >
           <ChevronLeft className="w-4 h-4 text-muted-foreground" />
         </button>

@@ -46,11 +46,20 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form action={action} className="space-y-4">
+        <form action={action} className="space-y-4" aria-label="Sign in form">
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium">Email</label>
-            <input id="email" name="email" type="email" placeholder="jane@example.com" required
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="jane@example.com"
+              required
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Email address"
+              autoComplete="email"
+            />
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -59,20 +68,29 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
-            <input id="password" name="password" type="password" placeholder="••••••••" required
-              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary" />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
+              className="w-full px-4 py-2 rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-required="true"
+              aria-label="Password"
+              autoComplete="current-password"
+            />
           </div>
 
           <div className="flex items-center gap-2">
             <input id="rememberMe" name="rememberMe" type="checkbox" defaultChecked
-              className="h-4 w-4 rounded border accent-primary" />
+              className="h-4 w-4 rounded border accent-primary focus:ring-2 focus:ring-primary" aria-label="Remember me for 30 days" />
             <label htmlFor="rememberMe" className="text-sm text-muted-foreground select-none cursor-pointer">
               Remember me for 30 days
             </label>
           </div>
 
           {state?.error && (
-            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2 flex gap-2 items-start">
+            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded px-3 py-2 flex gap-2 items-start" role="alert">
               <span className="flex-1">{state.error}</span>
               {state.error.includes("verify your email") && (
                 <Link href="/verify-email" className="underline shrink-0">Resend email</Link>
@@ -80,8 +98,12 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button type="submit" disabled={isPending}
-            className="w-full py-2 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium disabled:opacity-50 hover:opacity-90 transition-opacity">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full py-2 rounded-[var(--radius-card)] bg-primary text-primary-foreground font-medium disabled:opacity-50 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Sign in"
+          >
             {isPending ? "Signing in…" : "Sign in"}
           </button>
         </form>

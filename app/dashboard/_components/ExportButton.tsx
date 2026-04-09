@@ -66,25 +66,42 @@ export function ExportButton({ messages, fileName }: Props) {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-sm font-medium hover:bg-muted transition-colors">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-sm font-medium hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Export analysis options"
+      >
         {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Download className="w-3.5 h-3.5" />}
         Export
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 w-52 rounded-lg border bg-popover shadow-lg z-50 py-1 overflow-hidden">
-          <button onClick={copyMd}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors">
+        <div className="absolute right-0 top-full mt-1.5 w-52 rounded-lg border bg-popover shadow-lg z-50 py-1 overflow-hidden" role="menu" aria-label="Export options">
+          <button
+            onClick={copyMd}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Copy as Markdown"
+            role="menuitem"
+          >
             <Copy className="w-3.5 h-3.5 text-muted-foreground" /> Copy as Markdown
           </button>
-          <button onClick={() => { downloadFile(toMarkdown(messages, fileName), `${base}.md`, "text/markdown"); setOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors">
+          <button
+            onClick={() => { downloadFile(toMarkdown(messages, fileName), `${base}.md`, "text/markdown"); setOpen(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Download Markdown file"
+            role="menuitem"
+          >
             <Download className="w-3.5 h-3.5 text-muted-foreground" /> Download .md
           </button>
-          <button onClick={() => { downloadFile(toText(messages, fileName), `${base}.txt`, "text/plain"); setOpen(false); }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors">
+          <button
+            onClick={() => { downloadFile(toText(messages, fileName), `${base}.txt`, "text/plain"); setOpen(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Download text file"
+            role="menuitem"
+          >
             <Download className="w-3.5 h-3.5 text-muted-foreground" /> Download .txt
           </button>
         </div>
