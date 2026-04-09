@@ -1,4 +1,5 @@
 "use server";
+import { validateCsrf } from "@/lib/csrf";
 import { db } from "@/lib/db";
 import { sessions, csvChunks } from "@/lib/db/schema";
 import { parseCSV, chunkRows } from "@/lib/rag/chunk";
@@ -25,6 +26,10 @@ export async function uploadCSVAction(
 ): Promise<UploadState> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return { error: "Not authenticated" };
+
+  // CSRF validation — must match the __csrf cookie set by getCsrfTokenAction()
+  try { await validateCsrf(formData); }
+  catch { return { error: "Request validation failed. Please refresh the page." }; }
 
   const file = formData.get("file") as File;
   if (!file?.name)              return { error: "No file provided" };
