@@ -1,47 +1,67 @@
+import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-
-const redis = Redis.fromEnv();
+import { headers } from "next/headers";
 
 const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, "60s"),
-  analytics: true,
-  prefix: "csv-analyst:rl",
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(60, "1 m"),
+  prefix: "proxy",
 });
 
-export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+const PUBLIC_ROUTES = new Set([
+  "/",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+  "/privacy",
+  "/terms",
+]);
 
-  // Auth guard
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/billing")) {
-    const session = getSessionCookie(request);
-    if (!session) {
-      return NextResponse.redirect(new URL("/login", request.url));
+const PUBLIC_PREFIXES = [
+  "/api/auth",
+  "/_next",
+  "/favicon",
+  "/images",
+  "/fonts",
+];
+
+export default async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Always allow public prefixes
+  if (PUBLIC_PREFIXES.some(p => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  // Rate limit all API routes
+  if (pathname.startsWith("/api/")) {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "anonymous";
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
   }
 
-  // Rate limiting
-  if (pathname.startsWith("/api/") && !pathname.startsWith("/api/auth") && !pathname.startsWith("/api/webhooks")) {
-    const ip = request.ip ?? "anonymous";
-    const { success, remaining } = await ratelimit.limit(ip);
-    if (!success) {
-      return NextResponse.json(
-        { error: "Rate limit exceeded. Try again shortly.", code: "RATE_LIMITED" },
-        { status: 429 }
-      );
-    }
-    const res = NextResponse.next();
-    res.headers.set("X-RateLimit-Remaining", String(remaining));
-    return res;
+  // Allow public pages without auth
+  if (PUBLIC_ROUTES.has(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Require auth for all other routes
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/billing/:path*", "/api/:path*"],
-  skipProxyUrlNormalize: true,
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
