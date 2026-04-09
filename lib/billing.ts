@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { subscriptions, usageRecords, plans } from "@/lib/db/schema";
+import { subscriptions, usageRecords } from "@/lib/db/schema";
 import { eq, and, gte, lte } from "drizzle-orm";
 import { PLANS, type PlanKey } from "@/lib/stripe";
 
