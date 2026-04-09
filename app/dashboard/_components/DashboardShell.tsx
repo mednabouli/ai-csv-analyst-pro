@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useEffect, useState, useCallback } from "react";
 import { useChat } from "@ai-sdk/react";
+import { useCsrf } from "@/hooks/use-csrf";
 import { uploadCSVAction, type UploadState } from "@/app/actions/upload";
 import { getSessionMessagesAction, type SessionRow } from "@/app/actions/sessions";
 import { SessionSidebar } from "./SessionSidebar";
@@ -36,6 +37,7 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
   const [activeId,        setActiveId]        = useState<string | null>(null);
   const [provider,        setProvider]        = useState("gemma26b");
   const [formKey,         setFormKey]         = useState(0);
+  const { csrfToken, appendCsrf } = useCsrf();
 
   // ── Upload ─────────────────────────────────────────────────────────────────
   const [uploadState, uploadAction, isUploading] = useActionState<UploadState, FormData>(
@@ -118,6 +120,7 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <SessionSidebar
+          csrfToken={csrfToken}
           sessions={sidebarSessions}
           hasMore={sidebarHasMore}
           nextCursor={sidebarCursor}
@@ -190,7 +193,7 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
 
         {/* Body */}
         {!activeId ? (
-          <UploadArea key={formKey} action={uploadAction} isUploading={isUploading} />
+          <UploadArea key={formKey} action={uploadAction} isUploading={isUploading} appendCsrf={appendCsrf} />
         ) : (
           <div className="flex-1 flex flex-col min-h-0">
             {/* CSV preview — only on fresh upload */}
@@ -305,9 +308,10 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
   );
 }
 
-function UploadArea({ action, isUploading }: {
+function UploadArea({ action, isUploading, appendCsrf }: {
   action: (payload: FormData) => void;
   isUploading: boolean;
+  appendCsrf: (fd: FormData) => FormData;
 }) {
   return (
     <div className="flex-1 flex items-center justify-center p-6">
@@ -338,7 +342,7 @@ function UploadArea({ action, isUploading }: {
               className="sr-only"
               onChange={(e) => {
                 if (e.target.form && e.target.files?.[0]) {
-                  action(new FormData(e.target.form));
+                  action(appendCsrf(new FormData(e.target.form)));
                 }
               }}
             />
