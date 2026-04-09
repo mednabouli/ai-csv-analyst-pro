@@ -27,21 +27,26 @@ export async function uploadCSVAction(
   if (!session) return { error: "Not authenticated" };
 
   const file = formData.get("file") as File;
-  if (!file?.name) return { error: "No file provided" };
+  if (!file?.name)              return { error: "No file provided" };
   if (!file.name.endsWith(".csv")) return { error: "Only .csv files are accepted" };
 
-  // Guard memory — check size BEFORE reading buffer
+  // ── FIX 5: size guard runs BEFORE arrayBuffer() ──────────────────────────
+  // Reason: `await file.arrayBuffer()` reads the entire file into memory.
+  // A 200 MB file with a 20 MB plan limit would OOM the serverless function
+  // before the guard ever fired. `file.size` is available synchronously from
+  // the File metadata — use it first, then read bytes only if the check passes.
   const fileSizeMb = file.size / (1024 * 1024);
-  const limitCheck = await checkUploadLimit(session.user.id, fileSizeMb, 0);
-  if (!limitCheck.allowed) return { error: limitCheck.reason, upgradeRequired: true };
+  const sizeCheck  = await checkUploadLimit(session.user.id, fileSizeMb, 0);
+  if (!sizeCheck.allowed) return { error: sizeCheck.reason, upgradeRequired: true };
 
   return withTrace({
-    name: "csv.upload",
+    name:   "csv.upload",
     userId: session.user.id,
-    input: { fileName: file.name, fileSizeMb },
+    input:  { fileName: file.name, fileSizeMb },
     fn: async (traceId) => {
+      // ── Parse ────────────────────────────────────────────────────────────
       const parseSpan = createSpan(traceId, "csv.parse", { fileName: file.name });
-      const bytes = Buffer.from(await file.arrayBuffer());
+      const bytes = Buffer.from(await file.arrayBuffer()); // safe — size checked above
       let parsed;
       try {
         parsed = parseCSV(bytes);
@@ -56,32 +61,34 @@ export async function uploadCSVAction(
       }
       parseSpan.end({ output: { rows: meta.rowCount, cols: meta.columnCount } });
 
-      // Row-count limit check now that we know actual rows
+      // ── Row-count limit (needs actual count from parse) ──────────────────
       const rowCheck = await checkUploadLimit(session.user.id, fileSizeMb, meta.rowCount);
       if (!rowCheck.allowed) return { error: rowCheck.reason, upgradeRequired: true };
 
-      const chunks = chunkRows(data, meta.columns, 50);
+      // ── Embed ────────────────────────────────────────────────────────────
+      const chunks  = chunkRows(data, meta.columns, 50);
       const embedSpan = createSpan(traceId, "csv.embed", { chunkCount: chunks.length });
       const embeddings = await generateEmbeddings(chunks.map((c) => c.text));
       embedSpan.end({ output: { embeddingsGenerated: embeddings.length } });
 
+      // ── Persist ──────────────────────────────────────────────────────────
       const sessionId = uuid();
-      const dbSpan = createSpan(traceId, "csv.persist", { sessionId });
+      const dbSpan    = createSpan(traceId, "csv.persist", { sessionId });
       await db.transaction(async (tx) => {
         await tx.insert(sessions).values({
-          id: sessionId,
-          userId: session.user.id,
-          fileName: file.name,
-          rowCount: meta.rowCount,
+          id:          sessionId,
+          userId:      session.user.id,
+          fileName:    file.name,
+          rowCount:    meta.rowCount,
           columnCount: meta.columnCount,
-          sizeBytes: file.size,
+          sizeBytes:   file.size,
         });
         await tx.insert(csvChunks).values(
           chunks.map((chunk, i) => ({
             sessionId,
-            chunkText: chunk.text,
+            chunkText:  chunk.text,
             chunkIndex: i,
-            embedding: embeddings[i],
+            embedding:  embeddings[i],
           }))
         );
       });
@@ -89,15 +96,12 @@ export async function uploadCSVAction(
 
       await incrementUsage(session.user.id, "upload");
 
-      // First 10 rows for immediate preview
-      const previewRows = data.slice(0, 10) as Record<string, unknown>[];
-
       return {
         sessionId,
-        fileName: file.name,
-        rowCount: meta.rowCount,
-        columns: meta.columns,
-        previewRows,
+        fileName:    file.name,
+        rowCount:    meta.rowCount,
+        columns:     meta.columns,
+        previewRows: data.slice(0, 10) as Record<string, unknown>[],
       };
     },
   });
