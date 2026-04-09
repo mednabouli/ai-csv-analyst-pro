@@ -15,20 +15,23 @@ const ratelimit = new Ratelimit({
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Auth guard for dashboard
-  if (pathname.startsWith("/dashboard")) {
+  // Auth guard
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/billing")) {
     const session = getSessionCookie(request);
     if (!session) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  // Rate limiting for API routes
-  if (pathname.startsWith("/api/") && !pathname.startsWith("/api/auth")) {
+  // Rate limiting
+  if (pathname.startsWith("/api/") && !pathname.startsWith("/api/auth") && !pathname.startsWith("/api/webhooks")) {
     const ip = request.ip ?? "anonymous";
     const { success, remaining } = await ratelimit.limit(ip);
     if (!success) {
-      return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Try again shortly.", code: "RATE_LIMITED" },
+        { status: 429 }
+      );
     }
     const res = NextResponse.next();
     res.headers.set("X-RateLimit-Remaining", String(remaining));
@@ -39,6 +42,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/:path*"],
+  matcher: ["/dashboard/:path*", "/billing/:path*", "/api/:path*"],
   skipProxyUrlNormalize: true,
 };
