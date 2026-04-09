@@ -13,6 +13,8 @@ export type UploadState = {
   sessionId?: string;
   fileName?: string;
   rowCount?: number;
+  columns?: string[];
+  previewRows?: Record<string, unknown>[];
   error?: string;
   upgradeRequired?: boolean;
 } | null;
@@ -28,14 +30,16 @@ export async function uploadCSVAction(
   if (!file?.name) return { error: "No file provided" };
   if (!file.name.endsWith(".csv")) return { error: "Only .csv files are accepted" };
 
+  // Guard memory — check size BEFORE reading buffer
   const fileSizeMb = file.size / (1024 * 1024);
+  const limitCheck = await checkUploadLimit(session.user.id, fileSizeMb, 0);
+  if (!limitCheck.allowed) return { error: limitCheck.reason, upgradeRequired: true };
 
   return withTrace({
     name: "csv.upload",
     userId: session.user.id,
-    input: { fileName: file.name, fileSizeMb, fileSize: file.size },
+    input: { fileName: file.name, fileSizeMb },
     fn: async (traceId) => {
-      // ── Parse ──────────────────────────────────────────────────────────
       const parseSpan = createSpan(traceId, "csv.parse", { fileName: file.name });
       const bytes = Buffer.from(await file.arrayBuffer());
       let parsed;
@@ -52,17 +56,15 @@ export async function uploadCSVAction(
       }
       parseSpan.end({ output: { rows: meta.rowCount, cols: meta.columnCount } });
 
-      // ── Billing check ──────────────────────────────────────────────────
-      const limitCheck = await checkUploadLimit(session.user.id, fileSizeMb, meta.rowCount);
-      if (!limitCheck.allowed) return { error: limitCheck.reason, upgradeRequired: true };
+      // Row-count limit check now that we know actual rows
+      const rowCheck = await checkUploadLimit(session.user.id, fileSizeMb, meta.rowCount);
+      if (!rowCheck.allowed) return { error: rowCheck.reason, upgradeRequired: true };
 
-      // ── Embed ──────────────────────────────────────────────────────────
       const chunks = chunkRows(data, meta.columns, 50);
       const embedSpan = createSpan(traceId, "csv.embed", { chunkCount: chunks.length });
       const embeddings = await generateEmbeddings(chunks.map((c) => c.text));
       embedSpan.end({ output: { embeddingsGenerated: embeddings.length } });
 
-      // ── Persist ────────────────────────────────────────────────────────
       const sessionId = uuid();
       const dbSpan = createSpan(traceId, "csv.persist", { sessionId });
       await db.transaction(async (tx) => {
@@ -87,7 +89,16 @@ export async function uploadCSVAction(
 
       await incrementUsage(session.user.id, "upload");
 
-      return { sessionId, fileName: file.name, rowCount: meta.rowCount };
+      // First 10 rows for immediate preview
+      const previewRows = data.slice(0, 10) as Record<string, unknown>[];
+
+      return {
+        sessionId,
+        fileName: file.name,
+        rowCount: meta.rowCount,
+        columns: meta.columns,
+        previewRows,
+      };
     },
   });
 }
