@@ -22,6 +22,7 @@ export function parseCSV(bytes: Buffer): { data: Record<string, unknown>[]; meta
   });
 
   const columns = result.meta.fields ?? [];
+  if (columns.length === 0) throw new Error("CSV is empty or has no headers");
   const summary = buildSummary(result.data, columns);
 
   return {
@@ -42,8 +43,7 @@ function buildSummary(data: Record<string, unknown>[], columns: string[]): strin
     `Sample (first 3 rows):`,
     ...data.slice(0, 3).map((r, i) => `  Row ${i + 1}: ${JSON.stringify(r)}`),
   ];
-  return lines.join("
-");
+  return lines.join("\n");
 }
 
 export function chunkRows(data: Record<string, unknown>[], columns: string[], chunkSize = 50): CSVChunk[] {
@@ -51,8 +51,7 @@ export function chunkRows(data: Record<string, unknown>[], columns: string[], ch
   for (let i = 0; i < data.length; i += chunkSize) {
     const slice = data.slice(i, i + chunkSize);
     const header = columns.join(",");
-    const rows = slice.map(r => columns.map(c => String(r[c] ?? "")).join(",")).join("
-");
+    const rows = slice.map(r => columns.map(c => String(r[c] ?? "")).join(",")).join("\n");
     chunks.push({
       text: `${header}
 ${rows}`,

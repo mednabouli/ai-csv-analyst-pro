@@ -1,4 +1,4 @@
-import { streamText, createDataStreamResponse } from "ai";
+import { streamText, createDataStreamResponse, type LanguageModelV1 } from "ai";
 import * as Sentry from "@sentry/nextjs";
 import { PROVIDERS, type ProviderKey } from "@/lib/llm";
 import { buildRAGContext } from "@/lib/rag/strategy";
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   const limitCheck = await checkQueryLimit(session.user.id, provider);
   if (!limitCheck.allowed) {
     trace.update({ output: { ok: false, reason: limitCheck.reason } });
-    trace.flushAsync().catch(() => {});
+    langfuse.flushAsync().catch(() => {});
     return Response.json(
       { error: limitCheck.reason, upgradeRequired: true, upgrade: limitCheck.upgrade, traceId: trace.id },
       { status: 402 }
@@ -67,12 +67,12 @@ export async function POST(req: Request) {
   } catch (err) {
     ragSpan.end({ output: { error: (err as Error).message } });
     trace.update({ output: { ok: false, error: "rag_failed" } });
-    trace.flushAsync().catch(() => {});
+    langfuse.flushAsync().catch(() => {});
     Sentry.captureException(err, { tags: { scope: "rag.context", traceId: trace.id } });
     return new Response("Failed to retrieve context", { status: 500 });
   }
 
-  const model = PROVIDERS[provider as ProviderKey] ?? PROVIDERS.default;
+  const model = (PROVIDERS[provider as ProviderKey] ?? PROVIDERS.default) as unknown as LanguageModelV1;
 
   // ── Stream — trace stays OPEN until onFinish ─────────────────────────────
   return createDataStreamResponse({
@@ -129,7 +129,7 @@ ${context}`,
 
           // ── Close trace NOW (stream is done) ────────────────────────────
           trace.update({ output: { ok: true, tokens: usage.totalTokens } });
-          trace.flushAsync().catch(() => {});
+          langfuse.flushAsync().catch(() => {});
 
           dataStream.writeMessageAnnotation({
             usage,
@@ -147,7 +147,7 @@ ${context}`,
       // Close trace on stream error too
       Sentry.captureException(err, { tags: { scope: "chat.stream", traceId: trace.id } });
       trace.update({ output: { ok: false, error: (err as Error).message } });
-      trace.flushAsync().catch(() => {});
+      langfuse.flushAsync().catch(() => {});
       return `Error: ${(err as Error).message}`;
     },
   });

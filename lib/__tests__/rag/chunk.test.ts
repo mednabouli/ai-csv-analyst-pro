@@ -80,7 +80,7 @@ describe("parseCSV", () => {
   });
 
   it("handles commas inside quoted fields", () => {
-    const csv = \`name,description\n"Smith, John","A, B, C"\`;
+    const csv = `name,description\n"Smith, John","A, B, C"`;
     const { data, meta } = parseCSV(Buffer.from(csv, "utf-8"));
     expect(meta.columnCount).toBe(2);
     expect(data[0].name).toBe("Smith, John");

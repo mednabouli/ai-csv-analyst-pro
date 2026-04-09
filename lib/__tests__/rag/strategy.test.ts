@@ -8,8 +8,13 @@ vi.mock("@/lib/db", () => ({
     select: vi.fn(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          orderBy: vi.fn(() => Promise.resolve(mockChunks.map(c => ({ text: c.chunkText })))),
-          limit: vi.fn(() => Promise.resolve(mockChunks.slice(0, 5).map(c => ({ text: c.chunkText, similarity: 0.9 })))),
+          orderBy: vi.fn(() => {
+            const p = Promise.resolve(mockChunks.map(c => ({ text: c.chunkText })));
+            (p as unknown as Record<string, unknown>).limit = vi.fn(() =>
+              Promise.resolve(mockChunks.slice(0, 5).map(c => ({ text: c.chunkText })))
+            );
+            return p;
+          }),
         })),
       })),
     })),

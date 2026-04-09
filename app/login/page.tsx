@@ -22,7 +22,7 @@ export default function LoginPage() {
         email,
         password,
         callbackURL:    "/dashboard",
-        dontRememberMe: !rememberMe,
+        rememberMe,
       });
 
       if (error) {
@@ -41,7 +41,7 @@ export default function LoginPage() {
         <div>
           <h1 className="text-2xl font-bold">Welcome back</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Don't have an account?{" "}
+            {"Don't have an account?"}{" "}
             <Link href="/signup" className="text-primary underline underline-offset-4">Sign up</Link>
           </p>
         </div>

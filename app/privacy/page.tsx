@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <h1 className="text-3xl font-bold">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Effective date: {EFFECTIVE}</p>
           <p className="text-sm text-muted-foreground">
-            This policy describes how {APP} ("we", "us") collects, uses, and protects
+            This policy describes how {APP} (&quot;we&quot;, &quot;us&quot;) collects, uses, and protects
             personal information when you use our Service.
           </p>
         </div>

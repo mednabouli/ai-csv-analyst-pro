@@ -1,5 +1,5 @@
 "use client";
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, Trash2, Pencil, Check, X, FileSpreadsheet, ChevronLeft, Loader2 } from "lucide-react";
 import {
   renameSessionAction, deleteSessionAction,
@@ -140,8 +140,6 @@ export function SessionSidebar({
   const [nextCursor,  setNextCursor]  = useState<Date | null>(initialCursor);
   const [collapsed,   setCollapsed]   = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [_pending, startTransition]   = useTransition();
-
   // Sync when parent passes new initial props (e.g. new upload added)
   useEffect(() => {
     setSessions(initialSessions);

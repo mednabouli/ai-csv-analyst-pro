@@ -28,8 +28,8 @@ export default function TermsPage() {
 
         <Section title="1. Acceptance of Terms">
           <p>
-            By accessing or using {APP} ("Service"), you agree to be bound by these Terms of
-            Service ("Terms"). If you do not agree to these Terms, do not use the Service.
+            By accessing or using {APP} (&quot;Service&quot;), you agree to be bound by these Terms of
+            Service (&quot;Terms&quot;). If you do not agree to these Terms, do not use the Service.
           </p>
           <p>
             These Terms apply to all visitors, users, and others who access or use the Service.
@@ -42,7 +42,7 @@ export default function TermsPage() {
           <p>
             {APP} is an AI-powered data analysis platform that allows users to upload CSV files
             and interact with their data through a natural language chat interface. The Service
-            uses large language models ("LLMs") from third-party providers to generate responses.
+            uses large language models (&quot;LLMs&quot;) from third-party providers to generate responses.
           </p>
           <p>
             AI-generated responses are for informational purposes only and should not be relied
@@ -64,7 +64,7 @@ export default function TermsPage() {
 
         <Section title="4. Your Data">
           <p>
-            You retain all ownership rights to the CSV data you upload ("User Data"). By
+            You retain all ownership rights to the CSV data you upload (&quot;User Data&quot;). By
             uploading data, you grant us a limited, non-exclusive licence to process, store, and
             transmit your data solely to provide the Service.
           </p>
@@ -119,7 +119,7 @@ export default function TermsPage() {
 
         <Section title="8. Disclaimer of Warranties">
           <p>
-            THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND,
+            THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND,
             EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
             FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE
             SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT AI OUTPUTS WILL BE ACCURATE.

@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
   const [state, action, isPending] = useActionState<State, FormData>(
     async (_prev, formData) => {
       const email = formData.get("email") as string;
-      const { error } = await authClient.forgetPassword({
+      const { error } = await authClient.requestPasswordReset({
         email,
         redirectTo: "/reset-password",
       });
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         <div>
           <h1 className="text-2xl font-bold">Forgot password?</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Enter your email and we'll send you a reset link.
+            {"Enter your email and we'll send you a reset link."}
           </p>
         </div>
 

@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("stripe", () => ({ default: vi.fn().mockReturnValue({}) }));
+
 import { PLANS } from "@/lib/stripe";
 
 // ── Mock DB so no real Neon connection needed ────────────────────────────────

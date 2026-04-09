@@ -37,7 +37,7 @@ export async function withTrace<T>(params: TraceParams<T>): Promise<T> {
     });
     throw err;
   } finally {
-    trace.flushAsync().catch(() => {});
+    langfuse.flushAsync().catch(() => {});
   }
 }
 

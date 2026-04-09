@@ -59,6 +59,8 @@ describe("withTrace", () => {
 });
 
 describe("captureError", () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it("calls Sentry.captureException with an Error", () => {
     captureError(new Error("e"), { ctx: "test" });
     expect(Sentry.captureException).toHaveBeenCalledOnce();

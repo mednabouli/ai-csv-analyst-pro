@@ -28,12 +28,12 @@ const SUGGESTION_CHIPS = [
   "Are there any missing or null values?",
 ];
 
-export function DashboardShell({ user, initialSessions, initialHasMore, initialNextCursor }: Props) {
+export function DashboardShell({ user: _user, initialSessions, initialHasMore, initialNextCursor }: Props) {
   const toast = useToast();
   const [sidebarOpen,     setSidebarOpen]     = useState(false);
   const [sidebarSessions, setSidebarSessions] = useState<SessionRow[]>(initialSessions);
-  const [sidebarHasMore,  setSidebarHasMore]  = useState(initialHasMore);
-  const [sidebarCursor,   setSidebarCursor]   = useState<Date | null>(initialNextCursor);
+  const [sidebarHasMore,  _setSidebarHasMore]  = useState(initialHasMore);
+  const [sidebarCursor,   _setSidebarCursor]   = useState<Date | null>(initialNextCursor);
   const [activeId,        setActiveId]        = useState<string | null>(null);
   const [provider,        setProvider]        = useState("gemma26b");
   const [formKey,         setFormKey]         = useState(0);
@@ -58,7 +58,7 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
         sizeBytes:   0,
         createdAt:   new Date(),
       };
-      setSidebarSessions((prev) => [newSess, ...prev]);
+      setSidebarSessions((prev) => [newSess, ...prev]); // eslint-disable-line react-hooks/set-state-in-effect
       setActiveId(uploadState.sessionId);
       setFormKey((k) => k + 1);
       toast({
@@ -67,7 +67,7 @@ export function DashboardShell({ user, initialSessions, initialHasMore, initialN
         variant:     "success",
       });
     }
-  }, [uploadState]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [uploadState]);
 
   // ── Chat ───────────────────────────────────────────────────────────────────
   const {

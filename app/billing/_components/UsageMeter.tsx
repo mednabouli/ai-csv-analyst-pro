@@ -26,7 +26,7 @@ function Meter({ label, used, max }: { label: string; used: number; max: number 
 export function UsageMeter({ usage, plan }: Props) {
   return (
     <div className="p-6 rounded-[var(--radius-card)] border shadow-[var(--shadow-card)] space-y-6">
-      <h2 className="text-lg font-semibold">This month's usage</h2>
+      <h2 className="text-lg font-semibold">{"This month's usage"}</h2>
       <Meter label="CSV Uploads" used={usage.uploadsUsed} max={plan.monthlyUploads} />
       <Meter label="AI Queries" used={usage.queriesUsed} max={plan.monthlyQueries} />
       <p className="text-xs text-muted-foreground pt-2">

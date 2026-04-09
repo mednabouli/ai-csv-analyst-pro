@@ -9,4 +9,7 @@
  * fully removed — the AI SDK's useChat() hook handles optimistic message
  * display internally and correctly.
  */
-export {};
+/** Stub — chat UI lives in DashboardShell. Kept so DashboardClient import resolves. */
+export function ChatPanel(_props: { sessionId: string }) {
+  return null;
+}

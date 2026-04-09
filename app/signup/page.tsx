@@ -1,14 +1,11 @@
 "use client";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
 type State = { error?: string; success?: boolean } | null;
 
 export default function SignupPage() {
-  const router = useRouter();
-
   const [state, action, isPending] = useActionState<State, FormData>(
     async (_prev, formData) => {
       const name     = formData.get("name") as string;

@@ -20,14 +20,14 @@ export function PricingCards({ currentPlan, hasStripeCustomer }: Props) {
       body: JSON.stringify({ plan }),
     });
     const { url } = await res.json();
-    if (url) window.location.href = url;
+    if (url) router.push(url);
     setLoading(null);
   }
 
   async function handlePortal() {
     const res = await fetch("/api/billing/portal", { method: "POST" });
     const { url } = await res.json();
-    if (url) window.location.href = url;
+    if (url) router.push(url);
   }
 
   return (

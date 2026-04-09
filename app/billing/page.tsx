@@ -1,9 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
-import { subscriptions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
 import { getOrCreateSubscription, getCurrentUsage } from "@/lib/billing";
 import { PLANS, type PlanKey } from "@/lib/stripe";
 import { PricingCards } from "./_components/PricingCards";
