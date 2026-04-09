@@ -4,7 +4,7 @@ import { nextCookies } from "better-auth/next-js";
 import { db } from "@/lib/db";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resend  = new Resend(process.env.RESEND_API_KEY!);
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 const APP_NAME = "CSV Analyst Pro";
 
@@ -20,13 +20,13 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await resend.emails.send({
         from: `${APP_NAME} <noreply@${process.env.EMAIL_DOMAIN}>`,
-        to: user.email,
+        to:   user.email,
         subject: "Reset your password",
         html: emailTemplate({
           heading: "Reset your password",
-          body: "Click the button below to reset your password. This link expires in 1 hour.",
-          cta: { label: "Reset Password", url },
-          footer: "If you didn't request a password reset, you can safely ignore this email.",
+          body:    "Click the button below to reset your password. This link expires in 1 hour.",
+          cta:     { label: "Reset Password", url },
+          footer:  "If you didn\'t request a password reset, you can safely ignore this email.",
         }),
       });
     },
@@ -39,13 +39,13 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
         from: `${APP_NAME} <noreply@${process.env.EMAIL_DOMAIN}>`,
-        to: user.email,
+        to:   user.email,
         subject: `Verify your ${APP_NAME} email`,
         html: emailTemplate({
           heading: "Verify your email",
-          body: "Click the button below to verify your email address and activate your account.",
-          cta: { label: "Verify Email", url },
-          footer: "This link expires in 24 hours. If you didn't sign up, you can safely ignore this.",
+          body:    "Click the button below to verify your email address and activate your account.",
+          cta:     { label: "Verify Email", url },
+          footer:  "This link expires in 24 hours. If you didn\'t sign up, you can safely ignore this.",
         }),
       });
     },
@@ -54,24 +54,26 @@ export const auth = betterAuth({
   // ── OAuth ───────────────────────────────────────────────────────────────
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientId:     process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientId:     process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
 
   // ── Session ─────────────────────────────────────────────────────────────
+  // FIX: set expiresIn to 30 days — this is the "remember me" duration.
+  // When the user does NOT check "remember me" in the login form, the client
+  // calls signIn.email({ dontRememberMe: true }) which instructs better-auth
+  // to issue a session-scoped cookie instead of a persistent 30-day one.
+  // No custom headers or server-side hacks required.
   session: {
-    expiresIn: 60 * 60 * 24 * 7,          // 7 days default
-    updateAge: 60 * 60 * 24,               // refresh daily
+    expiresIn:   60 * 60 * 24 * 30,   // 30 days  (persistent / "remember me")
+    updateAge:   60 * 60 * 24,         // refresh the token once per day
     cookieCache: { enabled: true, maxAge: 60 * 5 },
   },
-
-  // ── Plugins ─────────────────────────────────────────────────────────────
-  plugins: [nextCookies()],
 
   // ── Account ─────────────────────────────────────────────────────────────
   account: {
@@ -80,17 +82,20 @@ export const auth = betterAuth({
       trustedProviders: ["google", "github"],
     },
   },
+
+  // ── Plugins ─────────────────────────────────────────────────────────────
+  plugins: [nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session;
 export type User    = typeof auth.$Infer.Session.user;
 
-// ── Email template helper ────────────────────────────────────────────────────
+// ── Email template ───────────────────────────────────────────────────────────
 function emailTemplate(opts: {
   heading: string;
-  body: string;
-  cta: { label: string; url: string };
-  footer: string;
+  body:    string;
+  cta:     { label: string; url: string };
+  footer:  string;
 }): string {
   return `<!DOCTYPE html>
 <html>
