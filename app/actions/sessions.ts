@@ -5,22 +5,23 @@ import { eq, desc, and, lt } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { validateCsrf, CSRF_FIELD } from "@/lib/csrf";
 import type { Message } from "ai";
 
 export const PAGE_SIZE = 20;
 
 export type SessionRow = {
-  id: string;
-  fileName: string;
-  rowCount: number;
+  id:          string;
+  fileName:    string;
+  rowCount:    number;
   columnCount: number;
-  sizeBytes: number;
-  createdAt: Date;
+  sizeBytes:   number;
+  createdAt:   Date;
 };
 
 export type SessionPage = {
-  sessions: SessionRow[];
-  hasMore: boolean;
+  sessions:   SessionRow[];
+  hasMore:    boolean;
   nextCursor: Date | null;
 };
 
@@ -33,11 +34,17 @@ const SESSION_COLS = {
   createdAt:   sessions.createdAt,
 };
 
+// ── Helper: build a minimal FormData for CSRF check on non-file actions ───────
+function csrfForm(csrfToken: string): FormData {
+  const fd = new FormData();
+  fd.set(CSRF_FIELD, csrfToken);
+  return fd;
+}
+
 export async function getUserSessionsAction(): Promise<SessionPage> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return { sessions: [], hasMore: false, nextCursor: null };
 
-  // Fetch PAGE_SIZE + 1 to detect whether more pages exist
   const rows = await db
     .select(SESSION_COLS)
     .from(sessions)
@@ -47,11 +54,7 @@ export async function getUserSessionsAction(): Promise<SessionPage> {
 
   const hasMore = rows.length > PAGE_SIZE;
   const page    = rows.slice(0, PAGE_SIZE);
-  return {
-    sessions:   page,
-    hasMore,
-    nextCursor: hasMore ? page[page.length - 1].createdAt : null,
-  };
+  return { sessions: page, hasMore, nextCursor: hasMore ? page[page.length - 1].createdAt : null };
 }
 
 export async function getMoreSessionsAction(cursor: Date): Promise<SessionPage> {
@@ -61,22 +64,13 @@ export async function getMoreSessionsAction(cursor: Date): Promise<SessionPage> 
   const rows = await db
     .select(SESSION_COLS)
     .from(sessions)
-    .where(
-      and(
-        eq(sessions.userId, session.user.id),
-        lt(sessions.createdAt, cursor)         // strictly older than cursor
-      )
-    )
+    .where(and(eq(sessions.userId, session.user.id), lt(sessions.createdAt, cursor)))
     .orderBy(desc(sessions.createdAt))
     .limit(PAGE_SIZE + 1);
 
   const hasMore = rows.length > PAGE_SIZE;
   const page    = rows.slice(0, PAGE_SIZE);
-  return {
-    sessions:   page,
-    hasMore,
-    nextCursor: hasMore ? page[page.length - 1].createdAt : null,
-  };
+  return { sessions: page, hasMore, nextCursor: hasMore ? page[page.length - 1].createdAt : null };
 }
 
 export async function getSessionMessagesAction(sessionId: string): Promise<Message[]> {
@@ -96,32 +90,48 @@ export async function getSessionMessagesAction(sessionId: string): Promise<Messa
     .where(eq(chatMessages.sessionId, sessionId))
     .orderBy(chatMessages.createdAt);
 
-  return rows.map((r) => ({
-    id: r.id,
-    role: r.role as "user" | "assistant",
-    content: r.content,
-  }));
+  return rows.map((r) => ({ id: String(r.id), role: r.role as "user" | "assistant", content: r.content }));
 }
 
-export async function renameSessionAction(sessionId: string, name: string): Promise<void> {
+export async function renameSessionAction(
+  sessionId:  string,
+  name:       string,
+  csrfToken:  string         // ← required: must match __csrf cookie
+): Promise<void> {
+  // CSRF: verify the token passed by the client matches the signed cookie
+  try { await validateCsrf(csrfForm(csrfToken)); }
+  catch { return; } // silently drop forged requests
+
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return;
+
   const trimmed = name.trim().slice(0, 128);
   if (!trimmed) return;
+
   await db
     .update(sessions)
     .set({ fileName: trimmed })
     .where(and(eq(sessions.id, sessionId), eq(sessions.userId, session.user.id)));
+
   revalidatePath("/dashboard");
 }
 
-export async function deleteSessionAction(sessionId: string): Promise<void> {
+export async function deleteSessionAction(
+  sessionId: string,
+  csrfToken: string          // ← required: must match __csrf cookie
+): Promise<void> {
+  // CSRF: verify the token passed by the client matches the signed cookie
+  try { await validateCsrf(csrfForm(csrfToken)); }
+  catch { return; } // silently drop forged requests
+
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return;
+
   await db.delete(chatMessages).where(eq(chatMessages.sessionId, sessionId));
   await db.delete(csvChunks).where(eq(csvChunks.sessionId, sessionId));
   await db
     .delete(sessions)
     .where(and(eq(sessions.id, sessionId), eq(sessions.userId, session.user.id)));
+
   revalidatePath("/dashboard");
 }
