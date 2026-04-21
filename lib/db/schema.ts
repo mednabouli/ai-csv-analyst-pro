@@ -22,6 +22,7 @@ export const sessions = pgTable("csv_sessions", {
   rowCount: integer("row_count").notNull().default(0),
   columnCount: integer("column_count").notNull().default(0),
   sizeBytes: integer("size_bytes").notNull().default(0),
+  columns: text("columns").array(), // nullable for backward compat
   ...timestamps,
 });
 

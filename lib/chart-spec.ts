@@ -14,6 +14,11 @@ export function buildChartSpecTool(columns: string[]) {
       if (!columns.includes(params.x_column) || !columns.includes(params.y_column)) {
         throw new Error("x_column or y_column not in session columns");
       }
+      // Explicitly check chart_type is valid (defensive, matches test)
+      const validTypes = ["bar", "line", "pie", "scatter"];
+      if (!validTypes.includes(params.chart_type)) {
+        throw new Error("Unknown chart type");
+      }
       return params;
     },
     run: async (params: { x_column: string; y_column: string; chart_type: string }) => {

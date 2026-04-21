@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { POST } from '../route';
 
+// Mock next/headers for Next.js API route compatibility
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() => Promise.resolve({})),
+}));
+
 // Mock dependencies as needed
 vi.mock('@/lib/auth', () => ({
   auth: { api: { getSession: vi.fn() } }

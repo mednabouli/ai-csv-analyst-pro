@@ -87,6 +87,7 @@ export async function uploadCSVAction(
           rowCount:    meta.rowCount,
           columnCount: meta.columnCount,
           sizeBytes:   file.size,
+          columns:     meta.columns,
         });
         await tx.insert(csvChunks).values(
           chunks.map((chunk, i) => ({
