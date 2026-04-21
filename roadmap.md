@@ -24,11 +24,17 @@
 - Implement tool-based analysis and structured responses.
 - Add fallback logic for full-context vs RAG.
 
-## Phase 4 — Chat UX
+## Phase 4 — Chart Enhancements (Complete)
 - Build streaming chat interface.
 - Add optimistic UI and loading states.
 - Add model selector for provider switching.
 - Add analysis history and saved prompts.
+- Add ChartBlock component for chart rendering (bar, line, pie).
+- Enable chart type switching (bar/line/pie) in dashboard.
+- Add chart captions and inline insights below charts.
+- Add "Copy chart image" button for SVG export.
+- Improve accessibility and feedback for chart actions.
+- Phase complete: All chart features shipped and tested (2026-04-21).
 
 ## Phase 5 — Billing and usage
 - Add Stripe subscriptions.

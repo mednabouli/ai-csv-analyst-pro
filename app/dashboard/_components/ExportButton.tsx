@@ -57,7 +57,8 @@ export function ExportButton({ messages, fileName }: Props) {
 
   function copyMd() {
     navigator.clipboard.writeText(toMarkdown(messages, fileName)).then(() => {
-      setCopied(true); setOpen(false);
+      setCopied(true);
+      setOpen(false);
       setTimeout(() => setCopied(false), 2000);
     });
   }
@@ -74,7 +75,7 @@ export function ExportButton({ messages, fileName }: Props) {
         aria-label="Export analysis options"
       >
         {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Download className="w-3.5 h-3.5" />}
-        Export
+        {copied ? "Copied!" : "Export"}
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 

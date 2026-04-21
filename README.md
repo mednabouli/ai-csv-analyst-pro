@@ -24,17 +24,28 @@ It uses a **smart RAG strategy**: models with large context windows (Gemma 4, Ge
 
 ---
 
+
 ## Features
 
 - **Multi-model support** — Gemma 4 (free via Vercel AI Gateway), GPT-4o, Claude Sonnet, Gemini 2.5 Flash, and local Ollama models — switchable per query
 - **Smart RAG** — full-context for Gemma 4 (1M token window), pgvector similarity search fallback for other providers
 - **Streaming responses** — token-by-token via Vercel AI SDK with optimistic UI
+- **Chart enhancements** — Switch between Bar, Line, and Pie charts; each chart displays a descriptive caption and optional insight below; copy chart as SVG image to clipboard
 - **Secure auth** — email/password + Google + GitHub OAuth via better-auth
 - **Tiered billing** — Free / Starter ($9) / Pro ($29) with Stripe + usage enforcement
 - **Rate limiting** — Upstash Redis sliding window on all API routes
 - **Observability** — Langfuse AI traces with spans + generation logs; Sentry error capture
 - **Type-safe DB** — Drizzle ORM + Neon serverless Postgres with pgvector
 - **40+ unit tests** — Vitest suite covering chunking, RAG, billing, LLM config, telemetry
+
+---
+
+## Phase 4: Chart Enhancements (Complete)
+
+- Chart type switcher: Instantly switch between bar, line, and pie charts for the same data.
+- Insight captions: AI-generated captions appear below each chart.
+- One-click copy: Copy chart images (SVG) and text answers to clipboard with a single click.
+- All features verified in UAT and documented in CHANGELOG.md.
 
 ---
 

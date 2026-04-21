@@ -1,15 +1,25 @@
 # Project Research Summary
 
+
 **Project:** CSV Analyst Pro — Chart Rendering + Export Milestone
 **Domain:** AI-powered CSV analytics — inline chart generation and PNG/Markdown export
 **Researched:** 2026-04-20
+**Phase 4 Status:** ✅ Complete (2026-04-21)
 **Confidence:** HIGH
 
 ---
 
 ## Executive Summary
 
-CSV Analyst Pro is adding chart rendering and export to an existing working RAG chat loop. The industry-validated approach for this type of product is structured JSON tool calls: the LLM emits a `chart_spec` tool call with typed fields, and a client-side `<ChartBlock>` component renders it with Recharts. This is the same pattern used by Vanna.ai and chat2plot, and it is the only approach that is secure (no sandboxed execution), reliable (~0% failure with server-side column validation), and compatible with the existing Next.js 16 App Router architecture. Code execution sandboxes (ChatGPT style) are not viable for a Next.js SaaS and should not be considered.
+
+**Phase 4 shipped features:**
+- ChartBlock component for bar, line, and pie charts
+- Chart type switcher (bar/line/pie) in dashboard
+- Chart captions and inline insights
+- Copy chart image (SVG) to clipboard
+- Accessibility and feedback improvements
+
+CSV Analyst Pro added chart rendering and export to the RAG chat loop. The industry-validated approach for this type of product is structured JSON tool calls: the LLM emits a `chart_spec` tool call with typed fields, and a client-side `<ChartBlock>` component renders it with Recharts. This is the same pattern used by Vanna.ai and chat2plot, and it is the only approach that is secure (no sandboxed execution), reliable (~0% failure with server-side column validation), and compatible with the existing Next.js 16 App Router architecture. Code execution sandboxes (ChatGPT style) are not viable for a Next.js SaaS and should not be considered.
 
 The recommended stack is recharts@^2.15 with the shadcn/ui chart wrapper, html-to-image for PNG export, and native browser Blob API for Markdown export. Despite shadcn recently upgrading to Recharts v3, this milestone must use **recharts@^2.15**: Recharts v3 introduces a `react-redux` peer dependency and breaking API changes (removed `CategoricalChartState`, `activeShape`/`inactiveShape` deprecations) that are not warranted for a v1 personal tool. Version 2.15 is React 19 compatible, released January 2025, and well-tested in the App Router. The Vercel AI SDK is already installed at v4.3.x; the correct client-side part type is `type: 'tool-invocation'` with `toolInvocation.toolName === 'chart_spec'` — not the `type: 'tool-chart_spec'` pattern that appears in some SDK 4.2+ docs.
 
