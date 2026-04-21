@@ -25,10 +25,11 @@ const CHART_TYPES = [
   { label: "Bar", value: "bar" },
   { label: "Line", value: "line" },
   { label: "Pie", value: "pie" },
+  { label: "Scatter", value: "scatter" },
 ];
 
 export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
-  const [chartType, setChartType] = useState<"bar" | "line" | "pie">(
+  const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "scatter">(
     CHART_TYPES.some(t => t.value === spec.type) ? spec.type : "bar"
   );
   const [copied, setCopied] = useState(false);
@@ -70,6 +71,7 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
     case "bar": chartLabel = `Bar chart for ${spec.x} vs ${spec.y}`; break;
     case "line": chartLabel = `Line chart for ${spec.x} vs ${spec.y}`; break;
     case "pie": chartLabel = `Pie chart for ${spec.x}`; break;
+    case "scatter": chartLabel = `Scatter chart for ${spec.x} vs ${spec.y}`; break;
   }
 
   return (
@@ -105,6 +107,17 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
       </div>
       <div ref={chartRef} className="w-full h-96 border rounded bg-background flex items-center justify-center">
         {chartType === "bar" && (
+                  )}
+                  {chartType === "scatter" && (
+                    <ResponsiveContainer width="100%" height={384}>
+                      <ScatterChart>
+                        <XAxis dataKey={spec.x} name={spec.x} />
+                        <YAxis dataKey={spec.y} name={spec.y} />
+                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                        <Legend />
+                        <Scatter name="Data" data={data} fill="#8884d8" />
+                      </ScatterChart>
+                    </ResponsiveContainer>
           <ResponsiveContainer width="100%" height={384}>
             <BarChart data={data}>
               <XAxis dataKey={spec.x} />

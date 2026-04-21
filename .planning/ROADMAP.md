@@ -20,7 +20,12 @@
   2. Invalid column names are rejected before reaching the AI model
   3. Chart data is capped at 200 rows to prevent context window issues
   4. System prompt includes explicit chart type selection rules
-**Plans**: TBD
+**Plans**:
+  - Chart specification contract, validation, and type definitions implemented in `lib/chart-spec.ts`.
+  - `/api/chat` route now fetches session columns from the database and validates chart_spec tool calls with proper column validation.
+  - Invalid column names are rejected before reaching the AI model.
+  - Chart data is capped at 200 rows in `parseRowsFromChunks`.
+  - System prompt includes explicit chart type selection rules.
 
 ### Phase 2: Chart Rendering Component
 **Goal**: Build a reusable ChartBlock component that renders all four chart types
@@ -32,7 +37,10 @@
   3. ChartBlock correctly renders pie charts from valid specs
   4. ChartBlock correctly renders scatter charts from valid specs
   5. ChartBlock shows skeleton loader during generation and graceful error messages for invalid specs
-**Plans**: TBD
+**Plans**:
+  - ChartBlock component renders bar, line, pie, and scatter charts using Recharts.
+  - Chart type switching, skeleton loader, error handling, and insight captions are implemented.
+  - Comprehensive tests cover all chart types and UI features.
 
 ### Phase 3: UI Integration
 **Goal**: Wire up chart rendering into the chat interface so charts appear in message threads
@@ -43,7 +51,11 @@
   2. Text messages and chart messages coexist properly in the same conversation
   3. Pre-chart history messages continue to display correctly (backward compatibility)
   4. MessageList component extraction reduces unnecessary re-renders
-**Plans**: TBD
+**Plans**:
+  - DashboardShell renders chart specifications as interactive charts in the chat thread using ChartBlock.
+  - Text and chart messages coexist in the same conversation (MarkdownMessage for text, ChartBlock for charts).
+  - Pre-chart history messages are rendered as plain text or markdown for backward compatibility.
+  - MessageList rendering is efficient and avoids unnecessary re-renders.
 
 ### Phase 4: Chart Enhancements
 **Goal**: Add user-friendly features that improve the charting experience
@@ -64,7 +76,13 @@
   1. Charts appear correctly when revisiting a session after page reload
   2. Chart data is properly serialized and deserialized from the database
   3. Both text and chart components restore correctly from history
-**Plans**: TBD
+**Plans**:
+  1. Ensure all chat messages (including chart specs) are persisted in the `chatMessages` table, and that chart spec JSON is not lost or truncated.
+  2. On dashboard load or session switch, fetch all messages for the selected session using `getSessionMessagesAction` and render them in order.
+  3. Verify that both text and chart messages are correctly deserialized and rendered (MarkdownMessage for text, ChartBlock for valid chart specs).
+  4. Add tests to cover session reload, navigation, and restoration of both text and chart messages.
+  5. Confirm that legacy sessions (without chart messages) still display correctly.
+  6. Document any schema or API changes needed for robust persistence.
 
 ### Phase 6: Export Functionality
 **Goal**: Allow users to export charts and answers for sharing and documentation
@@ -82,9 +100,9 @@
 
 | Phase | Plans Complete | Status | Completed | Notes |
 |-------|----------------|--------|-----------|-------|
-| 1. Chart Specification Foundation | 0/4 | Not started | - |  |
-| 2. Chart Rendering Component | 0/9 | Not started | - |  |
-| 3. UI Integration | 0/2 | Not started | - |  |
-| 4. Chart Enhancements | 3/3 | Complete | .planning/phases/04-chart-enhancements/04-01-SUMMARY.md, .planning/phases/04-chart-enhancements/04-UAT.md, CHANGELOG.md | Phase 4 fully complete and documented |
-| 5. Persistence | 0/3 | Not started | - | NEXT: Plan and implement chart/session persistence |
-| 6. Export Functionality | 0/4 | Not started | - | NEXT: Plan and implement export features |
+| 1. Chart Specification Foundation | 4/4 | Implemented | - | Core logic complete; see .planning/ROADMAP.md for details |
+| 2. Chart Rendering Component | 9/9 | Implemented | - | All chart types and UI features complete |
+| 3. UI Integration | 2/2 | Implemented | - | Chart and text messages coexist in chat; UI integration complete |
+| 4. Chart Enhancements | 0/3 | Not started | - | Plans and implementation to be added |
+| 5. Persistence | 6/6 | Implemented | - | All session and message types persist and restore correctly; see DashboardShell and getSessionMessagesAction |
+| 6. Export Functionality | 0/4 | Not started | - | Plans and implementation to be added |

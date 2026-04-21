@@ -48,10 +48,13 @@ export async function POST(req: Request) {
     return new Response("Forbidden", { status: 403 });
   }
 
-  // ── Fetch columns for this session (stub: replace with actual fetch) ──
-  // TODO: Replace with actual columns fetch logic from DB or storage
-  // Example: const columns = sessionRow[0].columns || [];
-  const columns: string[] = []; // Placeholder, must be replaced
+
+  // ── Fetch columns for this session ──
+  // columns is stored as a text[] array in the DB, may be undefined/null for old sessions
+  let columns: string[] = [];
+  if (sessionRow[0] && Array.isArray(sessionRow[0].columns) && sessionRow[0].columns.length > 0) {
+    columns = sessionRow[0].columns;
+  }
   if (!Array.isArray(columns) || columns.length === 0) {
     return new Response("No columns found for this session", { status: 400 });
   }
