@@ -60,4 +60,31 @@
 
 ## Traceability
 
-(Updated by roadmap creation — filled during `/gsd-plan-phase 1`)
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CHART-01 | Phase 1 | Pending |
+| CHART-02 | Phase 1 | Pending |
+| CHART-03 | Phase 2 | Pending |
+| CHART-04 | Phase 3 | Pending |
+| CHART-05 | Phase 4 | Pending |
+| CHART-06 | Phase 4 | Pending |
+| CHART-07 | Phase 2 | Pending |
+| CHART-BAR | Phase 2 | Pending |
+| CHART-LINE | Phase 2 | Pending |
+| CHART-PIE | Phase 2 | Pending |
+| CHART-SCATTER | Phase 2 | Pending |
+| EXPORT-01 | Phase 6 | Pending |
+| EXPORT-02 | Phase 6 | Pending |
+| EXPORT-03 | Phase 6 | Pending |
+| EXPORT-04 | Phase 4 | Pending |
+| PERSIST-01 | Phase 5 | Pending |
+| PERSIST-02 | Phase 5 | Pending |
+| PERSIST-03 | Phase 5 | Pending |
+| VALID-01 | Phase 1 | Pending |
+| VALID-02 | Phase 1 | Pending |
+| VALID-03 | Phase 1 | Pending |
+| VALID-04 | Phase 1 | Pending |
+| UX-01 | Phase 2 | Pending |
+| UX-02 | Phase 2 | Pending |
+| UX-03 | Phase 3 | Pending |
+| UX-04 | Phase 2 | Pending |
