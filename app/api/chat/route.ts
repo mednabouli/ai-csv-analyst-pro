@@ -9,6 +9,7 @@ import { chatMessages } from "@/lib/db/schema";
 import { checkQueryLimit, incrementUsage } from "@/lib/billing";
 import { getLangfuse } from "@/lib/observability/langfuse";
 import { createSpan, recordGeneration } from "@/lib/observability/telemetry";
+import { buildChartSpecTool } from "@/lib/chart-spec";
 
 export const runtime   = "nodejs";
 export const maxDuration = 60;
@@ -29,6 +30,31 @@ export async function POST(req: Request) {
 
   if (!sessionId)            return new Response("Missing sessionId", { status: 400 });
   if (!messages?.length)     return new Response("Missing messages",  { status: 400 });
+
+
+  // ── IDOR check: verify sessionId belongs to user ──
+  const sessionRow = await db.query.sessions.findMany({
+    where: (s, { eq }) => eq(s.id, sessionId),
+    columns: {
+      userId: true,
+      // columns: true, // Uncomment if/when columns are stored in DB
+    },
+    limit: 1,
+  });
+  if (!sessionRow.length) {
+    return new Response("Session not found", { status: 404 });
+  }
+  if (sessionRow[0].userId !== session.user.id) {
+    return new Response("Forbidden", { status: 403 });
+  }
+
+  // ── Fetch columns for this session (stub: replace with actual fetch) ──
+  // TODO: Replace with actual columns fetch logic from DB or storage
+  // Example: const columns = sessionRow[0].columns || [];
+  const columns: string[] = []; // Placeholder, must be replaced
+  if (!Array.isArray(columns) || columns.length === 0) {
+    return new Response("No columns found for this session", { status: 400 });
+  }
 
   const userMessage = String(messages.at(-1)?.content ?? "");
 
@@ -83,11 +109,19 @@ export async function POST(req: Request) {
 Cite specific numbers, column names, and row values when relevant.
 If a question cannot be answered from the data, say so explicitly.
 
-CSV DATA:
-${context}`,
+CRITICAL: The only valid columns for this session are: ${columns.length ? columns.join(", ") : "(none)"}.
+
+Chart type selection rules:
+- Use 'bar' for categorical x and numeric y
+- Use 'line' for time series or ordered x and numeric y
+- Use 'pie' for part-to-whole with categorical x and numeric y (sum to 100%)
+- Use 'scatter' for two numeric columns
+
+CSV DATA:\n${context}`,
         messages: messages as { role: "user" | "assistant"; content: string }[],
         maxTokens: 4096,
-
+        tools: { chart_spec: buildChartSpecTool(columns) },
+        maxSteps: 1,
         async onFinish({ text, usage }) {
           // ── FIX 2: persist actual AI text, not the "streamed" placeholder ──
           try {
