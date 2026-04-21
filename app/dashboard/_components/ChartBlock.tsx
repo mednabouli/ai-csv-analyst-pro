@@ -33,6 +33,7 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
     CHART_TYPES.some(t => t.value === spec.type) ? spec.type : "bar"
   );
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
 
   if (!data || data.length === 0) {
@@ -66,6 +67,55 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
     }
   }
 
+  // Download chart as PNG
+  async function downloadChartPng() {
+    if (!chartRef.current) return;
+    const svg = chartRef.current.querySelector("svg");
+    if (!svg) return;
+    setDownloading(true);
+    try {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      // Create image
+      const img = new window.Image();
+      const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(svgBlob);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = svg.width.baseVal.value || 800;
+        canvas.height = svg.height.baseVal.value || 384;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = getComputedStyle(document.body).backgroundColor || "#fff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = "chart.png";
+              a.click();
+              URL.revokeObjectURL(a.href);
+            }
+            setDownloading(false);
+          }, "image/png");
+        } else {
+          setDownloading(false);
+        }
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => {
+        setDownloading(false);
+        URL.revokeObjectURL(url);
+        alert("Failed to render chart image.");
+      };
+      img.src = url;
+    } catch (err) {
+      setDownloading(false);
+      alert("PNG export failed: " + (err as Error).message);
+    }
+  }
+
   let chartLabel = "";
   switch (chartType) {
     case "bar": chartLabel = `Bar chart for ${spec.x} vs ${spec.y}`; break;
@@ -92,7 +142,7 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
             </Button>
           ))}
         </div>
-        <div>
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -102,6 +152,17 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
           >
             {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
             {copied ? "Copied!" : "Copy chart image"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Download chart as PNG"
+            onClick={downloadChartPng}
+            className="flex items-center gap-1"
+            disabled={downloading}
+          >
+            <Download className="w-4 h-4" />
+            {downloading ? "Downloading..." : "Download PNG"}
           </Button>
         </div>
       </div>

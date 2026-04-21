@@ -2,8 +2,17 @@
 import { useState, useRef, useEffect } from "react";
 import { Download, Copy, Check, ChevronDown } from "lucide-react";
 import type { Message } from "ai";
+import React from "react";
 
-interface Props { messages: Message[]; fileName: string }
+
+interface ChartExportProps {
+  chartRef?: React.RefObject<HTMLDivElement>;
+}
+
+type ExportButtonProps = {
+  messages: Message[];
+  fileName: string;
+} & Partial<ChartExportProps>;
 
 function toMarkdown(messages: Message[], fileName: string): string {
   const date = new Date().toLocaleDateString("en-CA");
@@ -41,7 +50,7 @@ function downloadFile(content: string, name: string, type: string) {
   URL.revokeObjectURL(a.href);
 }
 
-export function ExportButton({ messages, fileName }: Props) {
+export function ExportButton({ messages, fileName, chartRef }: ExportButtonProps) {
   const [open,   setOpen]   = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -63,7 +72,60 @@ export function ExportButton({ messages, fileName }: Props) {
     });
   }
 
-  if (!messages.length) return null;
+
+  // Chart image export helpers
+  function downloadChartSvg() {
+    if (!chartRef?.current) return;
+    const svg = chartRef.current.querySelector("svg");
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svg);
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${base}-chart.svg`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setOpen(false);
+  }
+
+  function downloadChartPng() {
+    if (!chartRef?.current) return;
+    const svg = chartRef.current.querySelector("svg");
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svg);
+    const img = new window.Image();
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(svgBlob);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = svg.width.baseVal.value || 800;
+      canvas.height = svg.height.baseVal.value || 384;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = getComputedStyle(document.body).backgroundColor || "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${base}-chart.png`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+          }
+        }, "image/png");
+      }
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      alert("Failed to render chart image.");
+    };
+    img.src = url;
+    setOpen(false);
+  }
 
   return (
     <div className="relative" ref={ref}>
@@ -80,7 +142,7 @@ export function ExportButton({ messages, fileName }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 w-52 rounded-lg border bg-popover shadow-lg z-50 py-1 overflow-hidden" role="menu" aria-label="Export options">
+        <div className="absolute right-0 top-full mt-1.5 w-60 rounded-lg border bg-popover shadow-lg z-50 py-1 overflow-hidden" role="menu" aria-label="Export options">
           <button
             onClick={copyMd}
             className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
@@ -105,6 +167,26 @@ export function ExportButton({ messages, fileName }: Props) {
           >
             <Download className="w-3.5 h-3.5 text-muted-foreground" /> Download .txt
           </button>
+          {chartRef && (
+            <>
+              <button
+                onClick={downloadChartSvg}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Download chart as SVG"
+                role="menuitem"
+              >
+                <Download className="w-3.5 h-3.5 text-muted-foreground" /> Download chart SVG
+              </button>
+              <button
+                onClick={downloadChartPng}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Download chart as PNG"
+                role="menuitem"
+              >
+                <Download className="w-3.5 h-3.5 text-muted-foreground" /> Download chart PNG
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
