@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockGetSession = vi.fn();
 const mockValidateCsrf = vi.fn();
 const mockCheckUploadLimit = vi.fn();
-const mockWithTrace = vi.fn();
+// Removed unused mockWithTrace
 
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: mockGetSession } },
@@ -15,7 +15,7 @@ vi.mock("@/lib/rag/chunk", () => ({
   chunkRows: vi.fn(() => [{ text: "chunk" }])
 }));
 vi.mock("@/lib/rag/embed", () => ({ generateEmbeddings: vi.fn(() => [ [0.1], [0.2] ]) }));
-vi.mock("@/lib/observability/telemetry", () => ({ withTrace: (opts: any) => opts.fn("traceid"), createSpan: () => ({ end: vi.fn() }) }));
+vi.mock("@/lib/observability/telemetry", () => ({ withTrace: (opts: { fn: (id: string) => unknown }) => opts.fn("traceid"), createSpan: () => ({ end: vi.fn() }) }));
 vi.mock("uuid", () => ({ v4: () => "session-uuid" }));
 vi.mock("@/lib/db", () => ({ db: { transaction: vi.fn(async (fn) => fn({ insert: vi.fn(() => ({ values: vi.fn() })) }) ) } }));
 vi.mock("@/lib/db/schema", () => ({ sessions: {}, csvChunks: {} }));
@@ -80,7 +80,7 @@ describe("uploadCSVAction", () => {
     mockValidateCsrf.mockResolvedValueOnce(undefined);
     mockCheckUploadLimit.mockResolvedValueOnce({ allowed: true });
     const { parseCSV } = await import("@/lib/rag/chunk");
-    (parseCSV as any).mockImplementationOnce(() => ({ data: [], meta: { rowCount: 0, columnCount: 1, columns: ["a"] } }));
+    (parseCSV as unknown as { mockImplementationOnce: (fn: () => unknown) => void }).mockImplementationOnce(() => ({ data: [], meta: { rowCount: 0, columnCount: 1, columns: ["a"] } }));
     const fd = new FormData();
     fd.set("file", new File(["a\n"], "test.csv"));
     const result = await uploadCSVAction(null, fd);
@@ -93,7 +93,7 @@ describe("uploadCSVAction", () => {
     mockValidateCsrf.mockResolvedValueOnce(undefined);
     mockCheckUploadLimit.mockResolvedValueOnce({ allowed: true });
     const { parseCSV } = await import("@/lib/rag/chunk");
-    (parseCSV as any).mockImplementationOnce(() => { throw new Error("parse error"); });
+    (parseCSV as unknown as { mockImplementationOnce: (fn: () => unknown) => void }).mockImplementationOnce(() => { throw new Error("parse error"); });
     const fd = new FormData();
     fd.set("file", new File(["bad"], "test.csv"));
     const result = await uploadCSVAction(null, fd);
@@ -106,7 +106,7 @@ describe("uploadCSVAction", () => {
     mockValidateCsrf.mockResolvedValueOnce(undefined);
     mockCheckUploadLimit.mockResolvedValueOnce({ allowed: true }).mockResolvedValueOnce({ allowed: false, reason: "too many rows" });
     const { parseCSV } = await import("@/lib/rag/chunk");
-    (parseCSV as any).mockImplementationOnce(() => ({ data: [{ a: 1 }], meta: { rowCount: 1000, columnCount: 1, columns: ["a"] } }));
+    (parseCSV as unknown as { mockImplementationOnce: (fn: () => unknown) => void }).mockImplementationOnce(() => ({ data: [{ a: 1 }], meta: { rowCount: 1000, columnCount: 1, columns: ["a"] } }));
     const fd = new FormData();
     fd.set("file", new File(["a\n1"], "test.csv"));
     const result = await uploadCSVAction(null, fd);
@@ -119,7 +119,7 @@ describe("uploadCSVAction", () => {
     mockValidateCsrf.mockResolvedValueOnce(undefined);
     mockCheckUploadLimit.mockResolvedValueOnce({ allowed: true }).mockResolvedValueOnce({ allowed: true });
     const { parseCSV } = await import("@/lib/rag/chunk");
-    (parseCSV as any).mockImplementationOnce(() => ({ data: [{ a: 1 }], meta: { rowCount: 1, columnCount: 1, columns: ["a"] } }));
+    (parseCSV as unknown as { mockImplementationOnce: (fn: () => unknown) => void }).mockImplementationOnce(() => ({ data: [{ a: 1 }], meta: { rowCount: 1, columnCount: 1, columns: ["a"] } }));
     const fd = new FormData();
     fd.set("file", new File(["a\n1"], "test.csv"));
     const result = await uploadCSVAction(null, fd);

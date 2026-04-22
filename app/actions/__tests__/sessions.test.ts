@@ -6,7 +6,7 @@ const mockDelete = vi.fn();
 const mockRevalidatePath = vi.fn();
 const mockValidateCsrf = vi.fn();
 
-const selectResults: any[] = [];
+const selectResults: unknown[] = [];
 const mockSelect = vi.fn(() => selectResults.shift());
 const mockSelectChain = () => ({
   from: () => ({
@@ -15,13 +15,14 @@ const mockSelectChain = () => ({
         const arr = selectResults.shift();
         // If .limit is called, return an object with .limit method
         // If .map is called, return the array directly
+        const arrUnknown = arr as unknown[];
         return {
           limit: mockSelect,
-          map: arr ? arr.map.bind(arr) : undefined,
+          map: arrUnknown ? arrUnknown.map.bind(arrUnknown) : undefined,
           // For test code that does: const rows = await db...orderBy(...).limit(...)
           // or: const rows = await db...orderBy(...); rows.map(...)
           // This allows both usages to work
-          [Symbol.iterator]: arr ? arr[Symbol.iterator].bind(arr) : undefined,
+          [Symbol.iterator]: arrUnknown ? arrUnknown[Symbol.iterator].bind(arrUnknown) : undefined,
         };
       },
       limit: mockSelect

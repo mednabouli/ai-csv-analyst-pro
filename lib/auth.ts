@@ -126,7 +126,7 @@ export type Session = typeof auth.$Infer.Session;
 export type User    = typeof auth.$Infer.Session.user;
 
 // ── Email template ─────────────────────────────────────────────────────────
-function emailTemplate(opts: {
+export function emailTemplate(opts: {
   heading: string;
   body:    string;
   cta:     { label: string; url: string };
