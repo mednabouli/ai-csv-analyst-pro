@@ -1,14 +1,11 @@
----
-title: CSV Analyst Pro
----
+
 
 # CSV Analyst Pro
-
 Ultra-fast, trustworthy AI analytics for your CSVs.
 
 One upload. Natural language questions. Instant answers, charts, and exportable insights.
 
-[Get Started](#quickstart) · [GitHub](https://github.com/mednabouli/ai-csv-analyst-pro)
+[Get Started](quickstart.md) · [GitHub](https://github.com/mednabouli/ai-csv-analyst-pro)
 
 ---
 

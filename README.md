@@ -1,4 +1,3 @@
-<div align="center">
 
 # CSV Analyst Pro
 
@@ -12,11 +11,10 @@
 
 [Live Demo](https://ai-csv-analyst-pro.vercel.app) · [Report Bug](https://github.com/mednabouli/ai-csv-analyst-pro/issues) · [Request Feature](https://github.com/mednabouli/ai-csv-analyst-pro/issues)
 
-</div>
-
 ---
 
-### Upload a CSV. Ask questions in plain language. Get instant, exportable insights.
+
+## Upload a CSV. Ask questions in plain language. Get instant, exportable insights
 
 ---
 
@@ -74,14 +72,14 @@ pnpm install
 
 Copy `.env.example` to `.env.local` and fill in your API keys:
 
-| Variable                  | Description                        |
-|---------------------------|------------------------------------|
-| NEON_DATABASE_URL         | Neon Postgres connection string    |
-| UPSTASH_REDIS_REST_URL    | Upstash Redis REST URL             |
-| UPSTASH_REDIS_REST_TOKEN  | Upstash Redis REST token           |
-| STRIPE_SECRET_KEY         | Stripe API key                     |
-| VERCEL_AI_API_KEY         | Vercel AI Gateway key              |
-| ...                      | See README/docs for full list      |
+| Variable                 | Description                     |
+|--------------------------|---------------------------------|
+| NEON_DATABASE_URL        | Neon Postgres connection string |
+| UPSTASH_REDIS_REST_URL   | Upstash Redis REST URL          |
+| UPSTASH_REDIS_REST_TOKEN | Upstash Redis REST token        |
+| STRIPE_SECRET_KEY        | Stripe API key                  |
+| VERCEL_AI_API_KEY        | Vercel AI Gateway key           |
+| ...                      | See README/docs for full list   |
 
 ### Start the App
 
@@ -95,15 +93,15 @@ Visit [http://localhost:3000](http://localhost:3000) and upload your first CSV!
 
 ## 📂 Project Structure
 
-```
+```text
 app/
-	├── page.tsx         # Landing page
-	├── login/           # Auth flows
-	├── dashboard/       # Upload + Chat UI
-	└── ...
+	├─ page.tsx         # Landing page
+	├─ login/           # Auth flows
+	├─ dashboard/       # Upload + Chat UI
+	└─ ...
 components/
-	└── ui/              # shadcn/ui components
-lib/                   # Auth, billing, chart, LLM, utils
+	└─ ui/              # shadcn/ui components
+lib/                  # Auth, billing, chart, LLM, utils
 ```
 
 ---
