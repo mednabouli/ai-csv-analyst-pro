@@ -35,18 +35,12 @@ export async function POST(req: Request) {
   // ── IDOR check: verify sessionId belongs to user ──
   const sessionRow = await db.query.sessions.findMany({
     where: (s, { eq }) => eq(s.id, sessionId),
-    columns: {
-      userId: true,
-      // columns: true, // Uncomment if/when columns are stored in DB
-    },
+    columns: { userId: true, columns: true },
     limit: 1,
   });
-  if (!sessionRow.length) {
-    return new Response("Session not found", { status: 404 });
-  }
-  if (sessionRow[0].userId !== session.user.id) {
-    return new Response("Forbidden", { status: 403 });
-  }
+
+  if (!sessionRow.length)                          return new Response("Session not found", { status: 404 });
+  if (sessionRow[0].userId !== session.user.id)    return new Response("Forbidden",         { status: 403 });
 
 
   // ── Fetch columns for this session ──

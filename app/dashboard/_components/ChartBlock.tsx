@@ -4,8 +4,11 @@ import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell
 } from "recharts";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Download } from "lucide-react";
 
+interface WindowWithClipboard extends Window {
+  ClipboardItem: new (data: Record<string, Blob>) => ClipboardItem;
+}
 
 export interface ChartBlockProps {
   spec: {
@@ -50,8 +53,8 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
       const svgString = serializer.serializeToString(svg);
       const blob = new Blob([svgString], { type: "image/svg+xml" });
       // Try clipboard API for SVG
-      if (navigator.clipboard && (window as any).ClipboardItem) {
-        const item = new (window as any).ClipboardItem({ "image/svg+xml": blob });
+      if (navigator.clipboard && (window as unknown as WindowWithClipboard).ClipboardItem) {
+        const item = new (window as unknown as WindowWithClipboard).ClipboardItem({ "image/svg+xml": blob });
         await navigator.clipboard.write([item]);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -135,7 +138,7 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
               size="sm"
               aria-pressed={chartType === t.value}
               aria-label={`Switch to ${t.label} chart`}
-              onClick={() => setChartType(t.value as any)}
+              onClick={() => setChartType(t.value as ChartBlockProps["spec"]["type"])}
               className="capitalize"
             >
               {t.label}
@@ -168,17 +171,6 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
       </div>
       <div ref={chartRef} className="w-full h-96 border rounded bg-background flex items-center justify-center">
         {chartType === "bar" && (
-                  )}
-                  {chartType === "scatter" && (
-                    <ResponsiveContainer width="100%" height={384}>
-                      <ScatterChart>
-                        <XAxis dataKey={spec.x} name={spec.x} />
-                        <YAxis dataKey={spec.y} name={spec.y} />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        <Legend />
-                        <Scatter name="Data" data={data} fill="#8884d8" />
-                      </ScatterChart>
-                    </ResponsiveContainer>
           <ResponsiveContainer width="100%" height={384}>
             <BarChart data={data}>
               <XAxis dataKey={spec.x} />
@@ -213,13 +205,24 @@ export function ChartBlock({ spec, data, insight }: ChartBlockProps) {
                 fill="#8884d8"
                 label
               >
-                {data.map((entry, idx) => (
+                {data.map((_, idx) => (
                   <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
               <Legend />
             </PieChart>
+          </ResponsiveContainer>
+        )}
+        {chartType === "scatter" && (
+          <ResponsiveContainer width="100%" height={384}>
+            <ScatterChart>
+              <XAxis dataKey={spec.x} name={spec.x} />
+              <YAxis dataKey={spec.y} name={spec.y} />
+              <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+              <Legend />
+              <Scatter name="Data" data={data} fill="#8884d8" />
+            </ScatterChart>
           </ResponsiveContainer>
         )}
       </div>

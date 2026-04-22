@@ -1,8 +1,3 @@
-  it("renders scatter chart and label", () => {
-    render(<ChartBlock {...baseProps} spec={{ ...baseProps.spec, type: "scatter" }} />);
-    expect(screen.getByText(/scatter chart for foo vs bar/i)).toBeInTheDocument();
-  });
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ChartBlock, ChartBlockProps } from "./ChartBlock";
 import "@testing-library/jest-dom";

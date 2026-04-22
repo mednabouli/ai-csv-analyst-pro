@@ -16,13 +16,14 @@ async function sendEmail(opts: {
   html:    string;
 }): Promise<void> {
   if (isDev || !process.env.RESEND_API_KEY) {
+    /* eslint-disable no-console */
     console.log("\n📧 [DEV EMAIL]");
     console.log(`   To:      ${opts.to}`);
     console.log(`   Subject: ${opts.subject}`);
-    // Extract the CTA link from the HTML for easy copy-paste in dev
     const match = opts.html.match(/href="([^"]+)"/);
     if (match) console.log(`   Link:    ${match[1]}`);
     console.log();
+    /* eslint-enable no-console */
     return;
   }
   const { Resend } = await import("resend");

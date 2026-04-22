@@ -13,7 +13,7 @@ describe('buildChartSpecTool', () => {
   });
 
   it('rejects unknown chart type', () => {
-    expect(() => tool.validate({ x_column: 'foo', y_column: 'bar', chart_type: 'unknown' } as any)).toThrow();
+    expect(() => tool.validate({ x_column: 'foo', y_column: 'bar', chart_type: 'unknown' } as unknown as ChartSpec)).toThrow();
   });
 
   it('rejects x_column not in columns', () => {
