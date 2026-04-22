@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Analyst Pro Documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
+  <style>
+    body { max-width: 800px; margin: 2rem auto; }
+    nav { margin-bottom: 2rem; }
+    .logo { font-size: 2rem; font-weight: bold; }
+    .section { margin-bottom: 2.5rem; }
+    table { width: 100%; }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="logo">CSV Analyst Pro</span>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#benchmarks">Benchmarks</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+      <li><a href="#links">Links</a></li>
+    </ul>
+  </nav>
+
+  <section class="section">
+    <h1>Ultra-fast, trustworthy AI analytics for your CSVs</h1>
+    <p>One upload. Natural language questions. Instant answers, charts, and exportable insights.</p>
+    <a href="#quickstart" role="button">Get Started</a>
+    <a href="https://github.com/mednabouli/ai-csv-analyst-pro" role="button" class="secondary">GitHub</a>
+  </section>
+
+  <section class="section" id="features">
+    <h2>Everything the others left out</h2>
+    <ul>
+      <li>⚡ <b>Blazing Fast</b>: Next.js 16, React 19, streaming UX, and Postgres vector search.</li>
+      <li>🔒 <b>Secure</b>: Multi-tenant auth, rate limiting, and edge-protected endpoints.</li>
+      <li>📊 <b>Charts & Insights</b>: Bar, line, pie, scatter, and exportable images.</li>
+      <li>🤖 <b>Multi-Provider AI</b>: Vercel AI SDK, RAG for large datasets, and cost-quality optimized.</li>
+      <li>🧩 <b>Composable</b>: Typed modules, shadcn/ui, Drizzle ORM, and Upstash Redis.</li>
+      <li>📝 <b>Export Everything</b>: Markdown, TXT, PNG, SVG, and full chat history.</li>
+    </ul>
+  </section>
+
+  <section class="section" id="benchmarks">
+    <h2>How We Stack Up</h2>
+    <table>
+      <thead>
+        <tr><th></th><th>CSV Analyst Pro</th><th>Python Notebooks</th><th>Excel</th><th>SaaS BI Tools</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>Setup</b></td><td>1-click deploy</td><td>Manual</td><td>Manual</td><td>Account/signup</td></tr>
+        <tr><td><b>Speed</b></td><td>⚡ Instant</td><td>Slow (Python)</td><td>Medium</td><td>Varies</td></tr>
+        <tr><td><b>Security</b></td><td>Multi-tenant, edge-protected</td><td>Local only</td><td>Local only</td><td>Cloud, varies</td></tr>
+        <tr><td><b>Export</b></td><td>Charts, Markdown, PNG, SVG, TXT</td><td>CSV, PNG</td><td>XLSX</td><td>PDF, PNG</td></tr>
+        <tr><td><b>AI</b></td><td>Multi-provider, RAG</td><td>None/limited</td><td>None</td><td>Varies</td></tr>
+        <tr><td><b>Cost</b></td><td>Free/self-host</td><td>Free</td><td>License</td><td>Subscription</td></tr>
+      </tbody>
+    </table>
+    <p>CSV Analyst Pro is built for speed, trust, and export flexibility—no vendor lock-in, no bloat.</p>
+  </section>
+
+  <section class="section" id="quickstart">
+    <h2>Up in 30 Seconds</h2>
+    <ol>
+      <li>
+        <b>Clone & Install</b>
+        <pre><code>git clone https://github.com/mednabouli/ai-csv-analyst-pro.git
+cd ai-csv-analyst-pro
+pnpm install</code></pre>
+      </li>
+      <li>
+        <b>Configure Environment</b>
+        <pre><code>cp .env.example .env.local
+# Fill in your API keys</code></pre>
+      </li>
+      <li>
+        <b>Start the App</b>
+        <pre><code>pnpm dev</code></pre>
+        <p>Visit <a href="http://localhost:3000">http://localhost:3000</a> and upload your first CSV!</p>
+      </li>
+    </ol>
+    <h3>Deploy to Vercel</h3>
+    <a href="https://vercel.com/new/clone?repository-url=https://github.com/mednabouli/ai-csv-analyst-pro"><img src="https://vercel.com/button" alt="Deploy with Vercel"></a>
+  </section>
+
+  <section class="section" id="links">
+    <h2>Additional Links</h2>
+    <ul>
+      <li><a href="https://github.com/mednabouli/ai-csv-analyst-pro">GitHub</a></li>
+      <li><a href="../CHANGELOG.md">Changelog</a></li>
+      <li><a href="../roadmap.md">Roadmap</a></li>
+      <li><a href="oauth-setup.md">OAuth Setup</a></li>
+      <li><a href="https://vercel.com/new/clone?repository-url=https://github.com/mednabouli/ai-csv-analyst-pro">Vercel Deploy</a></li>
+    </ul>
+  </section>
+
+  <footer style="margin-top:3rem; text-align:center; color:#888;">
+    &copy; 2026 CSV Analyst Pro. MIT License.
+  </footer>
+</body>
+</html>

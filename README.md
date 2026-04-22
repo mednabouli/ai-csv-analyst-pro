@@ -2,7 +2,7 @@
 
 # CSV Analyst Pro
 
-**AI-powered CSV analysis. Upload any dataset. Ask questions in plain language. Get instant insights.**
+**Ultra-fast, trustworthy AI analytics for your CSVs.**
 
 [![CI](https://github.com/mednabouli/ai-csv-analyst-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/mednabouli/ai-csv-analyst-pro/actions/workflows/ci.yml)
 [![Deploy](https://github.com/mednabouli/ai-csv-analyst-pro/actions/workflows/deploy.yml/badge.svg)](https://github.com/mednabouli/ai-csv-analyst-pro/actions/workflows/deploy.yml)
@@ -16,68 +16,129 @@
 
 ---
 
-## Overview
+### Upload a CSV. Ask questions in plain language. Get instant, exportable insights.
+
+---
+
+## ⚡ About The Project
 
 CSV Analyst Pro lets anyone — from data engineers to business analysts — have a natural language conversation with their CSV data. No SQL. No Python. Just upload a file and ask.
 
-It uses a **smart RAG strategy**: models with large context windows (Gemma 4, Gemini 2.5) receive the full dataset; smaller context models fall back to **pgvector semantic search** to retrieve the most relevant chunks before answering.
+- **Multi-model support:** Gemma 4, GPT-4o, Claude Sonnet, Gemini 2.5, Ollama (local)
+- **Smart RAG:** Full-context for large models, pgvector fallback for others
+- **Streaming chat:** Token-by-token answers, optimistic UI
+- **Export:** Markdown, TXT, PNG, SVG, and full chat history
+- **Secure:** Multi-tenant auth, rate limiting, edge-protected endpoints
+- **Billing:** Stripe plans, usage tracking, customer portal
+- **Observability:** Langfuse traces, Sentry errors, full test suite
 
 ---
 
+## 📸 Screenshots & Live Data
 
-## Features
-
-- **Multi-model support** — Gemma 4 (free via Vercel AI Gateway), GPT-4o, Claude Sonnet, Gemini 2.5 Flash, and local Ollama models — switchable per query
-- **Smart RAG** — full-context for Gemma 4 (1M token window), pgvector similarity search fallback for other providers
-- **Streaming responses** — token-by-token via Vercel AI SDK with optimistic UI
-- **Chart enhancements** — Switch between Bar, Line, and Pie charts; each chart displays a descriptive caption and optional insight below; copy chart as SVG image to clipboard
-- **Secure auth** — email/password + Google + GitHub OAuth via better-auth
-- **Tiered billing** — Free / Starter ($9) / Pro ($29) with Stripe + usage enforcement
-- **Rate limiting** — Upstash Redis sliding window on all API routes
-- **Observability** — Langfuse AI traces with spans + generation logs; Sentry error capture
-- **Type-safe DB** — Drizzle ORM + Neon serverless Postgres with pgvector
-- **40+ unit tests** — Vitest suite covering chunking, RAG, billing, LLM config, telemetry
+<!-- Replace with real screenshots if available -->
+![Dashboard Screenshot](https://placehold.co/800x400?text=CSV+Analyst+Pro+Dashboard)
 
 ---
 
-## Phase 4: Chart Enhancements (Complete)
+## 🛠️ Tech Stack & Services
 
-- Chart type switcher: Instantly switch between bar, line, and pie charts for the same data.
-- Insight captions: AI-generated captions appear below each chart.
-- One-click copy: Copy chart images (SVG) and text answers to clipboard with a single click.
-- All features verified in UAT and documented in CHANGELOG.md.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, PPR, React Compiler, Turbopack) |
-| Language | TypeScript 5.8 (strict) |
-| AI | Vercel AI SDK 4 — `streamText`, `useChat`, `useOptimistic` |
-| Models | Gemma 4 · Claude Sonnet · GPT-4o · Gemini 2.5 · Ollama |
-| Auth | better-auth 1.2 — email, Google, GitHub |
-| Database | Neon serverless Postgres + Drizzle ORM + pgvector |
-| Cache / RL | Upstash Redis + `@upstash/ratelimit` |
-| Billing | Stripe Checkout + Customer Portal + Webhooks |
-| Observability | Langfuse (AI traces) + Sentry (errors + replay) |
-| Styling | Tailwind CSS v4 (`@theme`) — zero config file |
-| Testing | Vitest 3 + `@vitest/coverage-v8` |
-| CI/CD | GitHub Actions → Vercel (preview on PR, prod on `main`) |
+| Layer         | Technology                                      |
+|-------------- |-------------------------------------------------|
+| Framework     | Next.js 16 (App Router, React 19, Turbopack)    |
+| Language      | TypeScript 5.8 (strict)                         |
+| AI            | Vercel AI SDK, multi-provider, RAG, pgvector    |
+| Auth          | better-auth (email, Google, GitHub)             |
+| Database      | Neon Postgres, Drizzle ORM, pgvector            |
+| Cache / RL    | Upstash Redis                                   |
+| Billing       | Stripe Checkout, Customer Portal                |
+| Observability | Langfuse, Sentry                                |
+| Styling       | Tailwind CSS v4, shadcn/ui                      |
+| Testing       | Vitest, @testing-library/react                  |
 
 ---
 
-## Architecture
+## 🚀 Getting Started
+
+Follow these steps to set up the project locally on your machine.
+
+### Prerequisites & Installation
+
+```sh
+git clone https://github.com/mednabouli/ai-csv-analyst-pro.git
+cd ai-csv-analyst-pro
+pnpm install
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in your API keys:
+
+| Variable                  | Description                        |
+|---------------------------|------------------------------------|
+| NEON_DATABASE_URL         | Neon Postgres connection string    |
+| UPSTASH_REDIS_REST_URL    | Upstash Redis REST URL             |
+| UPSTASH_REDIS_REST_TOKEN  | Upstash Redis REST token           |
+| STRIPE_SECRET_KEY         | Stripe API key                     |
+| VERCEL_AI_API_KEY         | Vercel AI Gateway key              |
+| ...                      | See README/docs for full list      |
+
+### Start the App
+
+```sh
+pnpm dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) and upload your first CSV!
+
+---
+
+## 📂 Project Structure
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                      Next.js 16                         │
-│                                                         │
-│  app/                                                   │
-│  ├── page.tsx                  Landing page             │
-│  ├── login/                    better-auth              │
-│  ├── dashboard/                Upload + Chat UI         │
+app/
+	├── page.tsx         # Landing page
+	├── login/           # Auth flows
+	├── dashboard/       # Upload + Chat UI
+	└── ...
+components/
+	└── ui/              # shadcn/ui components
+lib/                   # Auth, billing, chart, LLM, utils
+```
+
+---
+
+## 🌎 Deployment
+
+1. **Vercel:** Import the repo in your Vercel dashboard.
+2. **Env Vars:** Add all required API keys in Vercel project settings.
+3. **Custom Domain:** (Optional) Set up your domain in Vercel and providers.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/mednabouli/ai-csv-analyst-pro)
+
+---
+
+## 🗺️ Roadmap
+
+See [roadmap.md](./roadmap.md) for planned and completed phases.
+
+---
+
+## 📜 Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for the latest updates and fixes.
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## 📄 License
+
+[MIT](LICENSE)
 │  ├── billing/                  Plans + Usage meters     │
 │  └── api/                                               │
 │      ├── auth/[...all]         better-auth handler      │
