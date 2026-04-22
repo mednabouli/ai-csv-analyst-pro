@@ -1,9 +1,11 @@
 # Plan
 
 ## Objective
+
 Build a production-ready AI data analytics SaaS where users upload CSV files, ask questions, and receive fast, reliable answers with a modern Next.js 16 frontend.
 
 ## Target architecture
+
 - Next.js 16 App Router frontend.
 - React 19 server-first component model.
 - better-auth for authentication.
@@ -14,6 +16,7 @@ Build a production-ready AI data analytics SaaS where users upload CSV files, as
 - shadcn/ui + Tailwind CSS v4 for UI.
 
 ## Build order
+
 1. Scaffold the repo and configure tooling.
 2. Add auth and protected routes.
 3. Implement CSV upload and storage.
@@ -24,6 +27,7 @@ Build a production-ready AI data analytics SaaS where users upload CSV files, as
 8. Add observability, tests, and deployment.
 
 ## Key decisions
+
 - Use proxy.ts instead of legacy middleware patterns.
 - Use React 19 new hooks in forms and optimistic UI.
 - Use RAG for large files and direct context for smaller ones.
@@ -31,12 +35,14 @@ Build a production-ready AI data analytics SaaS where users upload CSV files, as
 - Prefer production patterns over tutorial shortcuts.
 
 ## Risks
+
 - Large CSVs can exceed context limits if not chunked.
 - LLM cost can grow quickly without usage controls.
 - Auth and multi-tenancy must be correct from day one.
 - File processing and embeddings need queueing for scale.
 
 ## Success criteria
+
 - Upload works reliably.
 - Users can sign in and access isolated data.
 - Answers are fast, accurate, and traceable.

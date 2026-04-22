@@ -3,9 +3,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ExportButton } from "./ExportButton";
 import "@testing-library/jest-dom";
 
-const baseMessages = [
-  { role: "user", content: "Show me a chart." },
-  { role: "assistant", content: "Here is a chart." },
+import type { Message } from "ai";
+const baseMessages: Message[] = [
+  { id: "1", role: "user", content: "Show me a chart." },
+  { id: "2", role: "assistant", content: "Here is a chart." },
 ];
 
 describe("ExportButton", () => {
